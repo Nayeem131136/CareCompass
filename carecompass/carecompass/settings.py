@@ -24,8 +24,8 @@ SECRET_KEY = 'django-insecure-i1_i63so2fo#wmby(yhgk2_j$7=k$g7h5#@a$b^oomjh)bwza2
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS = []
+
 
 
 # Application definition
@@ -39,7 +39,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'home',  # <-- add
 ]
-
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',   # Required
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # Required
+    'django.contrib.messages.middleware.MessageMiddleware',     # Required
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
 # Templates
 from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -61,6 +69,7 @@ TEMPLATES = [
 
 
 WSGI_APPLICATION = 'carecompass.wsgi.application'
+ROOT_URLCONF = "carecompass.urls"
 
 
 # Database
