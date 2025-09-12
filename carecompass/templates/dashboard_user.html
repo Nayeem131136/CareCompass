@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section-spacer">
+  <div class="container">
+    <h2 class="heading">User Dashboard</h2>
+    <p class="text-white">You submitted <strong>{{ count }}</strong> reports.</p>
+    <a class="btn btn-neo" href="{% url 'submit_report' %}">Submit New Report</a>
+    <a class="btn btn-neo-outline" href="{% url 'report_list' %}">My Reports</a>
+  </div>
+</section>
+{% endblock %}

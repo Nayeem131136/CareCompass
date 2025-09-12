@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section-spacer">
+  <div class="container">
+    <h2 class="heading">Volunteer Dashboard</h2>
+    <div class="row g-3 mt-2">
+      {% for r in reports %}
+        <div class="glass p-3">
+          <h5 class="text-white">{{ r.title }}</h5>
+          <p class="text-white-50">{{ r.description }}</p>
+          <a class="btn btn-success" href="{% url 'report_action' r.id 'accept' %}">Accept</a>
+          <a class="btn btn-danger" href="{% url 'report_action' r.id 'reject' %}">Reject</a>
+        </div>
+      {% empty %}
+        <p class="text-white-50">No pending reports.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

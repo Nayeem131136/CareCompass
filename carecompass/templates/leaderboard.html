@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section-spacer">
+  <div class="container">
+    <h2 class="heading">Leaderboard</h2>
+
+    <h4 class="text-white mt-4">Top Users (Reports Submitted)</h4>
+    <ul class="text-white-50">
+      {% for u in top_users %}
+        <li>{{ u.username }} - {{ u.count }}</li>
+      {% empty %}
+        <li>No users yet.</li>
+      {% endfor %}
+    </ul>
+
+    <h4 class="text-white mt-4">Top Volunteers (Completed Reports)</h4>
+    <ul class="text-white-50">
+      {% for v in top_volunteers %}
+        <li>{{ v.username }} - {{ v.count }}</li>
+      {% empty %}
+        <li>No volunteers yet.</li>
+      {% endfor %}
+    </ul>
+
+    <h4 class="text-white mt-4">Top NGOs (Completed Reports)</h4>
+    <ul class="text-white-50">
+      {% for n in top_ngos %}
+        <li>{{ n.username }} - {{ n.count }}</li>
+      {% empty %}
+        <li>No NGOs yet.</li>
+      {% endfor %}
+    </ul>
+  </div>
+</section>
+{% endblock %}
