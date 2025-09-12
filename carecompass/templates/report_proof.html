@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section-spacer">
+<div class="container">
+<h2 class="heading">Report Proof</h2>
+<p class="text-white-50 mb-2">Report: {{ report.title }}</p>
+<p class="text-white-50 mb-2">Submitted by: {{ report.user.username }}</p>
+
+{% if report.media %}
+<div class="mb-3">
+{% if report.media.url.endswith:".mp4" %}
+<video controls class="w-100 rounded">{{ report.media.url }}</video>
+{% else %}
+<img src="{{ report.media.url }}" class="img-fluid rounded">
+{% endif %}
+</div>
+{% endif %}
+
+<p class="text-white-50">Location: <a href="{{ report.location }}" target="_blank" class="text-decoration-none text-info">{{ report.location }}</a></p>
+
+{% if user.role in 'volunteer' or user.role == 'ngo' %}
+<a href="{% url 'report_action' report.id 'verify' %}" class="btn btn-success me-2">Verify</a>
+<a href="{% url 'report_action' report.id 'reject' %}" class="btn btn-danger">Reject</a>
+{% endif %}
+</div>
+</section>
+{% endblock %}
