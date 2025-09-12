@@ -4,9 +4,11 @@ from .models import CustomUser
 
 
 class CustomUserAdmin(UserAdmin):
+    # Show these fields in admin list
     list_display = ('username', 'email', 'first_name', 'last_name', 'is_volunteer', 'is_ngo', 'is_staff')
     list_filter = ('role', 'is_staff', 'is_superuser', 'is_active')
 
+    # Fields to display when editing a user
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'phone', 'bio', 'profile_pic')}),
@@ -14,6 +16,7 @@ class CustomUserAdmin(UserAdmin):
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
 
+    # Optional: fields for adding new users
     add_fieldsets = (
         (None, {
             'classes': ('wide',),

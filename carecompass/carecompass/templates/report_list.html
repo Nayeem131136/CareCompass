@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section-spacer">
+  <div class="container">
+    <h2 class="heading">Report List</h2>
+    <div class="row g-3 mt-2">
+      {% for r in reports %}
+        <div class="col-md-6">
+          <div class="glass p-3 h-100">
+            <h6 class="text-white mb-1">
+              {{ r.title|default:"Report" }}
+              <span class="badge bg-light text-dark ms-1">{{ r.status|default:"pending" }}</span>
+            </h6>
+            <p class="text-white-50 mb-2">{{ r.description|default:"No description available" }}</p>
+            {% if r.file %}
+              <a class="btn btn-neo-outline btn-sm" target="_blank" href="{{ r.file.url }}">View File</a>
+            {% endif %}
+          </div>
+        </div>
+      {% empty %}
+        <p class="text-white-50">No reports yet.</p>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section-spacer">
+  <div class="container">
+    <h1 class="heading display-5">How CareCompass Works</h1>
+    <p class="subtext">
+      Report the location of people in need, alert nearby Volunteers/NGOs, and track real impact — safely and transparently.
+    </p>
+
+    <div class="row g-4">
+      <div class="col-md-6 col-lg-4">
+        <div class="glass p-4 h-100">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="icon-pill"><i class="bi bi-geo-alt-fill"></i></div>
+            <h5 class="m-0 text-white">Location-Based Reporting</h5>
+          </div>
+          <p class="text-white-50 mb-0">Drop a GPS pin, verified helpers nearby will respond quickly.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="glass p-4 h-100">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="icon-pill" style="background:linear-gradient(135deg,#22c55e,#06b6d4)"><i class="bi bi-bell-fill"></i></div>
+            <h5 class="m-0 text-white">Real-Time Alerts</h5>
+          </div>
+          <p class="text-white-50 mb-0">Instant notifications to nearby Volunteers/NGOs.</p>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-4">
+        <div class="glass p-4 h-100">
+          <div class="d-flex align-items-center gap-3 mb-3">
+            <div class="icon-pill" style="background:linear-gradient(135deg,#f43f5e,#ef4444)"><i class="bi bi-people-fill"></i></div>
+            <h5 class="m-0 text-white">Verified Network</h5>
+          </div>
+          <p class="text-white-50 mb-0">Safe support with verified NGOs and social workers.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-spacer">
+  <div class="container">
+    <h2 class="heading h1">Easy 3 Steps</h2>
+    <div class="row text-center g-4 mt-2">
+      <div class="col-md-4">
+        <div class="step-badge mx-auto mb-3">1</div>
+        <h6 class="text-white fw-bold">Report</h6>
+        <p class="text-white-50 small">Provide location and a short description.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="step-badge mx-auto mb-3" style="background:linear-gradient(135deg,#93c5fd,#2563eb);border-color:#bfdbfe">2</div>
+        <h6 class="text-white fw-bold">Connect</h6>
+        <p class="text-white-50 small">Alert goes to nearby helpers.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="step-badge mx-auto mb-3" style="background:linear-gradient(135deg,#fca5a5,#f43f5e);border-color:#fecaca">3</div>
+        <h6 class="text-white fw-bold">Help</h6>
+        <p class="text-white-50 small">Share updates with proof (Photo/Video).</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-spacer">
+  <div class="container">
+    <div class="cta text-center">
+      <h3 class="fw-black mb-2">Join Now</h3>
+      <p class="mb-4 opacity-90">Be part of our community of compassion.</p>
+      {% if not user.is_authenticated %}
+        <a href="{% url 'register' %}" class="btn btn-neo me-2"><i class="bi bi-person-plus"></i> Register</a>
+        <a href="{% url 'login' %}" class="btn btn-neo-outline"><i class="bi bi-box-arrow-in-right"></i> Login</a>
+      {% else %}
+        <span class="badge bg-light text-dark rounded-pill px-3 py-2">Welcome, {{ user.username }} 💙</span>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

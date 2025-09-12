@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section-spacer">
+  <div class="container auth-wrap">
+    <div class="auth-card">
+      <h2 class="auth-title mb-2 text-center">Create Account</h2>
+      <p class="text-center text-white-50 mb-4">Fill in your information to get started</p>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">First Name</label>
+            <input type="text" name="first_name" class="form-control" placeholder="Enter your first name"
+                   value="{{ form.first_name.value|default:'' }}">
+            {{ form.first_name.errors }}
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Last Name</label>
+            <input type="text" name="last_name" class="form-control" placeholder="Enter your last name"
+                   value="{{ form.last_name.value|default:'' }}">
+            {{ form.last_name.errors }}
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Username</label>
+          <input type="text" name="username" class="form-control" placeholder="Choose a username" required
+                 value="{{ form.username.value|default:'' }}">
+          {{ form.username.errors }}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input type="email" name="email" class="form-control" placeholder="Enter your email"
+                 value="{{ form.email.value|default:'' }}">
+          {{ form.email.errors }}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Phone Number (Optional)</label>
+          <input type="text" name="phone" class="form-control" placeholder="+880 1234 567890"
+                 value="{{ form.phone.value|default:'' }}">
+          {{ form.phone.errors }}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Select Role</label>
+          <select name="role" class="form-control" required>
+            <option value="user" {% if form.role.value == "user" %}selected{% endif %}>User</option>
+            <option value="volunteer" {% if form.role.value == "volunteer" %}selected{% endif %}>Volunteer</option>
+            <option value="ngo" {% if form.role.value == "ngo" %}selected{% endif %}>NGO</option>
+          </select>
+          {{ form.role.errors }}
+        </div>
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" name="password1" class="form-control" placeholder="Create a password" required>
+            {{ form.password1.errors }}
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Confirm Password</label>
+            <input type="password" name="password2" class="form-control" placeholder="Confirm your password" required>
+            {{ form.password2.errors }}
+          </div>
+        </div>
+
+        <button class="btn btn-neo w-100 mt-2" type="submit">Create Account</button>
+      </form>
+
+      <p class="mt-3 text-center text-white-50">
+        Already have an account? <a class="text-decoration-none" href="{% url 'login' %}">Login here</a>
+      </p>
+    </div>
+  </div>
+</section>
+{% endblock %}
