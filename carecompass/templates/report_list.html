@@ -2,23 +2,34 @@
 {% block content %}
 <section class="section-spacer">
   <div class="container">
-    <h2 class="heading">Report List</h2>
+    <h2 class="heading">All Reports</h2>
     <div class="row g-3 mt-2">
       {% for r in reports %}
         <div class="col-md-6">
           <div class="glass p-3 h-100">
             <h6 class="text-white mb-1">
-              {{ r.title|default:"Report" }}
-              <span class="badge bg-light text-dark ms-1">{{ r.status|default:"pending" }}</span>
+              {{ r.title }}
+              <span class="badge bg-light text-dark ms-1">{{ r.status }}</span>
             </h6>
-            <p class="text-white-50 mb-2">{{ r.description|default:"No description available" }}</p>
-            {% if r.file %}
-              <a class="btn btn-neo-outline btn-sm" target="_blank" href="{{ r.file.url }}">View File</a>
+            <p class="text-white-50 mb-2">{{ r.description|truncatechars:100 }}</p>
+
+            {% if r.photo %}
+              <img src="{{ r.photo.url }}" class="img-fluid rounded mb-2">
             {% endif %}
+
+            {% if r.latitude and r.longitude %}
+              <p class="text-info mb-2">
+                📍 <a href="https://maps.google.com/?q={{ r.latitude }},{{ r.longitude }}" target="_blank">
+                  {{ r.location }}
+                </a>
+              </p>
+            {% endif %}
+
+            <a href="{% url 'report_detail' r.id %}" class="btn btn-neo-outline btn-sm">View Details</a>
           </div>
         </div>
       {% empty %}
-        <p class="text-white-50">No reports yet.</p>
+        <p class="text-white-50">No reports available.</p>
       {% endfor %}
     </div>
   </div>
