@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="section-spacer">
+  <div class="container">
+    <div class="auth-card shadow-lg p-4 rounded-3">
+      <h2 class="auth-title text-center mb-4">Report Details</h2>
+
+      <!-- Reporter -->
+      <div class="mb-3">
+        <h5 class="text-neo">Reporter:</h5>
+        <p class="text-white-50">{{ report.submitted_by.username }}</p>
+      </div>
+
+      <!-- Title -->
+      <div class="mb-3">
+        <h5 class="text-neo">Title:</h5>
+        <p class="text-white-50">{{ report.title }}</p>
+      </div>
+
+      <!-- Description -->
+      <div class="mb-3">
+        <h5 class="text-neo">Description:</h5>
+        <p class="text-white-50">{{ report.description }}</p>
+      </div>
+
+      <!-- Photo -->
+      {% if report.photo %}
+      <div class="mb-3">
+        <h5 class="text-neo">Photo:</h5>
+        <img src="{{ report.photo.url }}" alt="Report Photo" class="img-fluid rounded shadow-sm mt-2">
+      </div>
+      {% endif %}
+
+      <!-- Video -->
+      {% if report.video %}
+      <div class="mb-3">
+        <h5 class="text-neo">Video:</h5>
+        <video controls class="w-100 rounded">
+          <source src="{{ report.video.url }}" type="video/mp4">
+        </video>
+      </div>
+      {% endif %}
+
+      <!-- Location -->
+      {% if report.latitude and report.longitude %}
+      <div class="mb-3">
+        <h5 class="text-neo">Location:</h5>
+        <p class="text-info">
+          {{ report.location }}
+        </p>
+        <div id="detail-map" style="height:300px;"></div>
+        <a href="https://www.google.com/maps?q={{ report.latitude }},{{ report.longitude }}" target="_blank" class="btn btn-neo-outline btn-sm mt-2">
+          Open in Google Maps
+        </a>
+      </div>
+      {% endif %}
+
+      <!-- Status -->
+      <div class="mb-3">
+        <h5 class="text-neo">Status:</h5>
+        <span class="badge bg-info">{{ report.status }}</span>
+      </div>
+
+      <!-- Proof Upload -->
+      {% if report.proof %}
+      <div class="mb-3">
+        <h5 class="text-neo">Proof:</h5>
+        <a href="{{ report.proof.url }}" target="_blank" class="btn btn-neo-outline btn-sm">View Proof</a>
+      </div>
+      {% endif %}
+
+      {% if user.is_authenticated and user.role in "ngo volunteer" %}
+      <form method="post" enctype="multipart/form-data" action="{% url 'report_action' report.id 'complete' %}">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label class="form-label">Upload Proof:</label>
+          <input type="file" name="proof" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-success">Mark as Completed</button>
+      </form>
+      {% endif %}
+
+      <div class="mt-4 text-center">
+        <a href="{% url 'report_list' %}" class="btn btn-neo-outline">Back to Reports</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Embed map -->
+{% if report.latitude and report.longitude %}
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcvLDaLcU7nr7NKqx7tKsKTVCRPfu_9Ss"></script>
+<script>
+  let map = new google.maps.Map(document.getElementById('detail-map'), {
+    center: {lat: {{ report.latitude }}, lng: {{ report.longitude }}},
+    zoom: 15
+  });
+  let marker = new google.maps.Marker({
+    position: {lat: {{ report.latitude }}, lng: {{ report.longitude }}},
+    map: map
+  });
+</script>
+{% endif %}
+{% endblock %}
