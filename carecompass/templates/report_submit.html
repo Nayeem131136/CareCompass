@@ -2,29 +2,80 @@
 {% block content %}
 <section class="section-spacer">
   <div class="container auth-wrap">
-    <div class="auth-card">
-      <h2 class="auth-title text-center">Submit Report</h2>
+    <div class="auth-card glass p-4 shadow-lg">
+      <h2 class="auth-title text-center mb-4">Submit a New Report</h2>
+
       <form method="post" enctype="multipart/form-data" novalidate>
         {% csrf_token %}
-        {% if form %}
-          {{ form.as_p }}
-        {% else %}
-          <div class="mb-3">
-            <label class="form-label">Detailed Description</label>
-            <textarea name="description" class="form-control" required></textarea>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Photo/Video</label>
-            <input type="file" name="file" class="form-control">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Location</label>
-            <input type="text" name="location" class="form-control">
-          </div>
-        {% endif %}
-        <button type="submit" class="btn btn-neo w-100">Submit</button>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Title</label>
+          <input type="text" name="title" class="form-control" required>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Description</label>
+          <textarea name="description" rows="4" class="form-control" required></textarea>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Photo</label>
+          <input type="file" name="photo" class="form-control">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-bold">Video</label>
+          <input type="file" name="video" class="form-control">
+        </div>
+
+        <div class="mb-3">
+         <label class="form-label fw-bold">Incident Location</label>
+         <input type="text" name="location" class="form-control" placeholder="Select on map" readonly>
+        </div>
+
+
+        <div id="map" style="height:300px;" class="mb-3"></div>
+        <input type="hidden" name="latitude" id="lat">
+        <input type="hidden" name="longitude" id="lng">
+
+        <button type="submit" class="btn btn-neo w-100">Submit Report</button>
       </form>
     </div>
   </div>
 </section>
+
+<!-- Google Maps API -->
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcvLDaLcU7nr7NKqx7tKsKTVCRPfu_9Ss&libraries=places"></script>
+
+<script>
+  let map = new google.maps.Map(document.getElementById('map'), {
+    center: {lat: 23.8103, lng: 90.4125},  // Dhaka default
+    zoom: 12
+  });
+
+  let marker;
+  let geocoder = new google.maps.Geocoder();
+
+  map.addListener('click', function(e){
+    let lat = e.latLng.lat();
+    let lng = e.latLng.lng();
+
+    // remove previous marker
+    if(marker) marker.setMap(null);
+
+    // add new marker
+    marker = new google.maps.Marker({position: e.latLng, map: map});
+
+    // set hidden inputs
+    document.getElementById('lat').value = lat;
+    document.getElementById('lng').value = lng;
+
+    // optional: reverse geocode to fill address input
+    geocoder.geocode({location: e.latLng}, function(results, status){
+      if(status === "OK" && results[0]){
+        document.querySelector("input[name='location']").value = results[0].formatted_address;
+      }
+    });
+  });
+</script>
 {% endblock %}

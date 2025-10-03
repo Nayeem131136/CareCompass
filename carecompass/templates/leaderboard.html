@@ -2,34 +2,68 @@
 {% block content %}
 <section class="section-spacer">
   <div class="container">
-    <h2 class="heading">Leaderboard</h2>
 
-    <h4 class="text-white mt-4">Top Users (Reports Submitted)</h4>
-    <ul class="text-white-50">
-      {% for u in top_users %}
-        <li>{{ u.username }} - {{ u.count }}</li>
-      {% empty %}
-        <li>No users yet.</li>
-      {% endfor %}
-    </ul>
+    <h2 class="heading mb-5 text-center">Leaderboards</h2>
 
-    <h4 class="text-white mt-4">Top Volunteers (Completed Reports)</h4>
-    <ul class="text-white-50">
-      {% for v in top_volunteers %}
-        <li>{{ v.username }} - {{ v.count }}</li>
-      {% empty %}
-        <li>No volunteers yet.</li>
-      {% endfor %}
-    </ul>
+    <div class="row g-4">
+      <!-- Top Users -->
+      <div class="col-md-4">
+        <div class="card shadow-sm">
+          <div class="card-header bg-primary text-white">
+            Top Report Submitters
+          </div>
+          <ul class="list-group list-group-flush">
+            {% for user in top_users %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ forloop.counter }}. {{ user.username }}</span>
+                <span class="badge bg-primary rounded-pill">{{ user.count }}</span>
+              </li>
+            {% empty %}
+              <li class="list-group-item text-muted">No users found.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
 
-    <h4 class="text-white mt-4">Top NGOs (Completed Reports)</h4>
-    <ul class="text-white-50">
-      {% for n in top_ngos %}
-        <li>{{ n.username }} - {{ n.count }}</li>
-      {% empty %}
-        <li>No NGOs yet.</li>
-      {% endfor %}
-    </ul>
+      <!-- Top Volunteers -->
+      <div class="col-md-4">
+        <div class="card shadow-sm">
+          <div class="card-header bg-warning text-dark">
+            Top Volunteers
+          </div>
+          <ul class="list-group list-group-flush">
+            {% for volunteer in top_volunteers %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ forloop.counter }}. {{ volunteer.username }}</span>
+                <span class="badge bg-warning text-dark rounded-pill">{{ volunteer.count }}</span>
+              </li>
+            {% empty %}
+              <li class="list-group-item text-muted">No volunteers found.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+
+      <!-- Top NGOs -->
+      <div class="col-md-4">
+        <div class="card shadow-sm">
+          <div class="card-header bg-success text-white">
+            Top NGOs
+          </div>
+          <ul class="list-group list-group-flush">
+            {% for ngo in top_ngos %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ forloop.counter }}. {{ ngo.username }}</span>
+                <span class="badge bg-success rounded-pill">{{ ngo.count }}</span>
+              </li>
+            {% empty %}
+              <li class="list-group-item text-muted">No NGOs found.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 {% endblock %}
