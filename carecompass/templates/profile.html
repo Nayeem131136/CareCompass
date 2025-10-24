@@ -2,34 +2,298 @@
 {% block content %}
 <section class="section-spacer">
   <div class="container">
-    <h2 class="heading">My Profile</h2>
-    <form method="post" enctype="multipart/form-data">
-      {% csrf_token %}
-      <div class="mb-3">
-        <label>First Name</label>
-        <input type="text" name="first_name" value="{{ user.first_name }}" class="form-control">
+    <h2 class="heading mb-4">My Profile</h2>
+
+    <div class="row g-4 justify-content-center">
+      <!-- Left Profile - Dynamic Display -->
+      <div class="col-lg-4">
+        <div class="glass p-4 text-center shadow-sm rounded h-100">
+          <!-- Profile Picture -->
+          <div class="profile-avatar-container mb-4">
+            {% if user.profile_pic %}
+              <img src="{{ user.profile_pic.url }}" class="profile-avatar img-fluid rounded-circle" alt="Profile Picture">
+            {% else %}
+              <div class="profile-avatar-placeholder rounded-circle mx-auto">
+                <i class="bi bi-person-circle"></i>
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- User Basic Info -->
+          <div class="profile-info">
+            <h4 class="fw-bold text-white mb-2">{{ user.username }}</h4>
+            <p class="text-white-50 mb-3">{{ user.email }}</p>
+
+            <!-- Role Badge -->
+            {% if user.role == "volunteer" %}
+              <span class="badge bg-success profile-badge">Volunteer</span>
+            {% elif user.role == "ngo" %}
+              <span class="badge bg-info profile-badge">NGO</span>
+            {% else %}
+              <span class="badge bg-secondary profile-badge">User</span>
+            {% endif %}
+          </div>
+
+          <!-- Dynamic Profile Details -->
+          <div class="profile-details mt-4 pt-3 border-top border-white-20">
+
+            <!-- Phone Number -->
+            {% if user.phone %}
+            <div class="detail-item mb-3">
+              <div class="text-white-50 small">Phone</div>
+              <div class="text-white">{{ user.phone }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Address -->
+            {% if user.address %}
+            <div class="detail-item mb-3">
+              <div class="text-white-50 small">Address</div>
+              <div class="text-white">{{ user.address }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Bio -->
+            {% if user.bio %}
+            <div class="detail-item mb-3">
+              <div class="text-white-50 small">Bio</div>
+              <div class="text-white">{{ user.bio|truncatewords:20 }}</div>
+            </div>
+            {% endif %}
+
+            <!-- Volunteer Skills -->
+            {% if user.role == "volunteer" and user.skills %}
+            <div class="detail-item mb-3">
+              <div class="text-white-50 small">Skills</div>
+              <div class="skills-display mt-1">
+                {% for skill in skills_list %}
+                  <span class="skill-badge">{{ skill }}</span>
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %}
+
+            <!-- Volunteer Certificates -->
+            {% if user.role == "volunteer" and user.certificate %}
+            <div class="detail-item mb-3">
+              <div class="text-white-50 small">Certificate</div>
+              <a href="{{ user.certificate.url }}" target="_blank" class="text-info small">View Certificate</a>
+            </div>
+            {% endif %}
+
+            <!-- NGO Organization -->
+            {% if user.role == "ngo" and user.organization_name %}
+            <div class="detail-item mb-3">
+              <div class="text-white-50 small">Organization</div>
+              <div class="text-white">{{ user.organization_name }}</div>
+            </div>
+            {% endif %}
+
+            <!-- NGO License -->
+            {% if user.role == "ngo" and user.license_file %}
+            <div class="detail-item mb-3">
+              <div class="text-white-50 small">License</div>
+              <a href="{{ user.license_file.url }}" target="_blank" class="text-info small">View License</a>
+            </div>
+            {% endif %}
+
+          </div>
+
+          <!-- Member Since -->
+          <div class="profile-meta mt-3 pt-3 border-top border-white-20">
+            <div class="text-white-50 small">
+              Member since<br>
+              <span class="text-white">{{ user.date_joined|date:"M Y" }}</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="mb-3">
-        <label>Last Name</label>
-        <input type="text" name="last_name" value="{{ user.last_name }}" class="form-control">
+
+      <!-- Right Form -->
+      <div class="col-lg-8">
+        <div class="glass p-4 rounded shadow-sm">
+          {% if messages %}
+            <div class="messages mb-4">
+              {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+              </div>
+            {% endif %}
+
+            <!-- Profile Picture -->
+            <div class="mb-3">
+              <label class="form-label text-white">Profile Picture</label>
+              <input type="file" name="profile_pic" class="form-control" accept="image/*">
+              {% if user.profile_pic %}
+                <small class="text-white-50">Current file: {{ user.profile_pic.name }}</small>
+              {% endif %}
+            </div>
+
+            <!-- Phone -->
+            <div class="mb-3">
+              <label class="form-label text-white">Phone</label>
+              <input type="text" name="phone" value="{{ user.phone|default:'' }}" class="form-control" placeholder="Enter your phone number">
+              {% if form.phone.errors %}
+                <div class="text-danger small">{{ form.phone.errors }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Address - For All Roles -->
+            <div class="mb-3">
+              <label class="form-label text-white">Address</label>
+              <textarea name="address" rows="2" class="form-control" placeholder="Enter your full address">{{ user.address|default:'' }}</textarea>
+              {% if form.address.errors %}
+                <div class="text-danger small">{{ form.address.errors }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Bio -->
+            <div class="mb-3">
+              <label class="form-label text-white">Bio</label>
+              <textarea name="bio" rows="3" class="form-control" placeholder="Tell us about yourself...">{{ user.bio|default:'' }}</textarea>
+              {% if form.bio.errors %}
+                <div class="text-danger small">{{ form.bio.errors }}</div>
+              {% endif %}
+            </div>
+
+            <!-- Volunteer Specific Fields -->
+            {% if user.role == "volunteer" %}
+              <div class="mb-3">
+                <label class="form-label text-white">Skills (comma separated)</label>
+                <input type="text" name="skills" value="{{ user.skills|default:'' }}" class="form-control" placeholder="e.g. First Aid, Communication, Teaching">
+                {% if form.skills.errors %}
+                  <div class="text-danger small">{{ form.skills.errors }}</div>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label text-white">Certificate Upload</label>
+                {% if user.certificate %}
+                  <p class="mt-2">
+                    <a href="{{ user.certificate.url }}" target="_blank" class="text-info">View Current Certificate</a>
+                  </p>
+                {% endif %}
+                <input type="file" name="certificate" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+                {% if form.certificate.errors %}
+                  <div class="text-danger small">{{ form.certificate.errors }}</div>
+                {% endif %}
+              </div>
+            {% endif %}
+
+            <!-- NGO Specific Fields -->
+            {% if user.role == "ngo" %}
+              <div class="mb-3">
+                <label class="form-label text-white">Organization Name</label>
+                <input type="text" name="organization_name" value="{{ user.organization_name|default:'' }}" class="form-control" placeholder="Enter your organization name">
+                {% if form.organization_name.errors %}
+                  <div class="text-danger small">{{ form.organization_name.errors }}</div>
+                {% endif %}
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label text-white">License Upload</label>
+                {% if user.license_file %}
+                  <p class="mt-2">
+                    <a href="{{ user.license_file.url }}" target="_blank" class="text-info">View Current License</a>
+                  </p>
+                {% endif %}
+                <input type="file" name="license_file" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+                {% if form.license_file.errors %}
+                  <div class="text-danger small">{{ form.license_file.errors }}</div>
+                {% endif %}
+              </div>
+            {% endif %}
+
+            <div class="text-end mt-4">
+              <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+            </div>
+          </form>
+        </div>
       </div>
-      <div class="mb-3">
-        <label>Phone</label>
-        <input type="text" name="phone" value="{{ user.phone }}" class="form-control">
-      </div>
-      <div class="mb-3">
-        <label>Bio</label>
-        <textarea name="bio" class="form-control">{{ user.bio }}</textarea>
-      </div>
-      <div class="mb-3">
-        <label>Profile Picture</label>
-        {% if user.profile_pic %}
-          <img src="{{ user.profile_pic.url }}" class="img-thumbnail mb-2" width="120">
-        {% endif %}
-        <input type="file" name="profile_pic" class="form-control">
-      </div>
-      <button type="submit" class="btn btn-neo">Update</button>
-    </form>
+    </div>
   </div>
 </section>
+
+<style>
+.profile-avatar-container {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-avatar {
+  width: 150px;
+  height: 150px;
+  object-fit: cover;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+}
+
+.profile-avatar-placeholder {
+  width: 150px;
+  height: 150px;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+}
+
+.profile-avatar-placeholder i {
+  font-size: 5rem;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.profile-badge {
+  padding: 0.5rem 1.5rem;
+  font-size: 0.9rem;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.border-white-20 {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.profile-info h4 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.detail-item {
+  text-align: left;
+}
+
+.skills-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.skill-badge {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 0.2rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.profile-meta {
+  font-size: 0.9rem;
+  text-align: center;
+}
+</style>
 {% endblock %}

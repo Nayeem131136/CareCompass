@@ -2,19 +2,438 @@
 {% block content %}
 <section class="section-spacer">
   <div class="container">
-    <h2 class="heading">Volunteer Dashboard</h2>
-    <div class="row g-3 mt-2">
-      {% for r in reports %}
-        <div class="glass p-3">
-          <h5 class="text-white">{{ r.title }}</h5>
-          <p class="text-white-50">{{ r.description }}</p>
-          <a class="btn btn-success" href="{% url 'report_action' r.id 'accept' %}">Accept</a>
-          <a class="btn btn-danger" href="{% url 'report_action' r.id 'reject' %}">Reject</a>
+    <!-- Header Section -->
+    <div class="dashboard-header text-center mb-5">
+      <h2 class="heading gradient-text">Volunteer Dashboard</h2>
+      <p class="text-light">Manage your accepted and completed reports</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row mb-5">
+      <div class="col-md-6">
+        <div class="neo-card accepted-card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="stats-icon me-3">
+                <i class="fas fa-tasks"></i>
+              </div>
+              <div>
+                <h3 class="mb-0 text-white">{{ accepted_reports.count }}</h3>
+                <p class="text-light mb-0">Active Reports</p>
+              </div>
+            </div>
+          </div>
         </div>
-      {% empty %}
-        <p class="text-white-50">No pending reports.</p>
-      {% endfor %}
+      </div>
+      <div class="col-md-6">
+        <div class="neo-card completed-card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <div class="stats-icon me-3">
+                <i class="fas fa-check-circle"></i>
+              </div>
+              <div>
+                <h3 class="mb-0 text-white">{{ completed_reports.count }}</h3>
+                <p class="text-light mb-0">Completed</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reports Section -->
+    <div class="neo-card">
+      <div class="card-body">
+        <h4 class="section-title mb-4 text-white">My Reports</h4>
+
+        <!-- Tabs Navigation -->
+        <div class="tabs-wrapper">
+          <ul class="nav neo-tabs mb-4">
+            <li class="nav-item">
+              <a class="nav-link active text-white" data-bs-toggle="tab" href="#accepted">
+                <i class="fas fa-tasks me-2"></i>
+                Accepted Reports
+                <span class="badge bg-primary">{{ accepted_reports.count }}</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-white" data-bs-toggle="tab" href="#completed">
+                <i class="fas fa-check-circle me-2"></i>
+                Completed Reports
+                <span class="badge bg-success">{{ completed_reports.count }}</span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="tab-content">
+            <!-- Accepted Reports Tab -->
+            <div class="tab-pane fade show active" id="accepted">
+              {% if accepted_reports %}
+              <div class="row g-4">
+                {% for report in accepted_reports %}
+                <div class="col-xl-4 col-lg-6">
+                  <div class="report-card accepted">
+                    <div class="card-header">
+                      <div class="d-flex justify-content-between align-items-start">
+                        <h5 class="report-title text-white">{{ report.title }}</h5>
+                        <span class="status-badge accepted">ACCEPTED</span>
+                      </div>
+                      <div class="report-meta">
+                        <small class="text-light">
+                          <i class="fas fa-calendar me-1"></i>
+                          {{ report.created_at|date:"M d, Y" }}
+                        </small>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <p class="report-desc text-light">{{ report.description|truncatewords:20 }}</p>
+
+                      {% if report.location %}
+                      <div class="location-info">
+                        <i class="fas fa-map-marker-alt text-info me-1"></i>
+                        <small class="text-light">{{ report.location }}</small>
+                      </div>
+                      {% endif %}
+                    </div>
+                    <div class="card-footer">
+                      <a href="{% url 'report_detail' report.id %}" class="btn btn-primary btn-sm w-100">
+                        <i class="fas fa-eye me-2"></i>View Details
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+              {% else %}
+              <div class="empty-state">
+                <div class="empty-icon">
+                  <i class="fas fa-tasks text-white"></i>
+                </div>
+                <h5 class="text-white">No Accepted Reports</h5>
+                <p class="text-light">You haven't accepted any reports yet.</p>
+                <a href="{% url 'report_list' %}" class="btn btn-primary">
+                  <i class="fas fa-list me-2"></i>Browse Reports
+                </a>
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Completed Reports Tab -->
+            <div class="tab-pane fade" id="completed">
+              {% if completed_reports %}
+              <div class="row g-4">
+                {% for report in completed_reports %}
+                <div class="col-xl-4 col-lg-6">
+                  <div class="report-card completed">
+                    <div class="card-header">
+                      <div class="d-flex justify-content-between align-items-start">
+                        <h5 class="report-title text-white">{{ report.title }}</h5>
+                        <span class="status-badge completed">COMPLETED</span>
+                      </div>
+                      <div class="report-meta">
+                        <small class="text-light">
+                          <i class="fas fa-calendar me-1"></i>
+                          {{ report.created_at|date:"M d, Y" }}
+                        </small>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <p class="report-desc text-light">{{ report.description|truncatewords:20 }}</p>
+
+                      {% if report.location %}
+                      <div class="location-info">
+                        <i class="fas fa-map-marker-alt text-info me-1"></i>
+                        <small class="text-light">{{ report.location }}</small>
+                      </div>
+                      {% endif %}
+
+                      {% if report.proof %}
+                      <div class="proof-info mt-2">
+                        <i class="fas fa-check-circle text-success me-1"></i>
+                        <small class="text-success">Proof Submitted</small>
+                      </div>
+                      {% endif %}
+                    </div>
+                    <div class="card-footer">
+                      <a href="{% url 'report_detail' report.id %}" class="btn btn-success btn-sm w-100">
+                        <i class="fas fa-eye me-2"></i>View Details
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+              {% else %}
+              <div class="empty-state">
+                <div class="empty-icon">
+                  <i class="fas fa-check-circle text-white"></i>
+                </div>
+                <h5 class="text-white">No Completed Reports</h5>
+                <p class="text-light">You haven't completed any reports yet.</p>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
+
+<style>
+.dashboard-header {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  padding: 2rem;
+  border-radius: 20px;
+  margin-bottom: 2rem;
+  border: 1px solid #333;
+}
+
+.gradient-text {
+  background: linear-gradient(45deg, #00ff88, #00ccff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.neo-card {
+  background: rgba(30, 30, 30, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid #333;
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.neo-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border-color: #00ff88;
+}
+
+.accepted-card {
+  border-left: 4px solid #00ccff;
+}
+
+.completed-card {
+  border-left: 4px solid #00ff88;
+}
+
+.stats-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #00ccff, #0099cc);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: white;
+}
+
+.completed-card .stats-icon {
+  background: linear-gradient(135deg, #00ff88, #00cc66);
+}
+
+.neo-tabs {
+  border-bottom: 2px solid #333;
+}
+
+.neo-tabs .nav-link {
+  color: #ccc;
+  border: none;
+  padding: 1rem 1.5rem;
+  margin-bottom: -2px;
+  border-radius: 8px 8px 0 0;
+  transition: all 0.3s ease;
+  position: relative;
+  background: transparent;
+}
+
+.neo-tabs .nav-link.active {
+  color: #00ff88;
+  background: rgba(0, 255, 136, 0.1);
+  border-bottom: 2px solid #00ff88;
+}
+
+.neo-tabs .nav-link:hover {
+  color: #00ff88;
+  background: rgba(0, 255, 136, 0.05);
+}
+
+.report-card {
+  background: rgba(40, 40, 40, 0.8);
+  border: 1px solid #333;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  height: 100%;
+}
+
+.report-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 255, 136, 0.2);
+  border-color: #00ff88;
+}
+
+.report-card.accepted {
+  border-left: 4px solid #00ccff;
+}
+
+.report-card.completed {
+  border-left: 4px solid #00ff88;
+}
+
+.card-header {
+  background: transparent;
+  border-bottom: 1px solid #333;
+  padding: 1.25rem 1.25rem 0.5rem;
+}
+
+.card-body {
+  padding: 1rem 1.25rem;
+}
+
+.card-footer {
+  background: transparent;
+  border-top: 1px solid #333;
+  padding: 1rem 1.25rem;
+}
+
+.report-title {
+  color: white;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.report-desc {
+  color: #ddd;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.accepted {
+  background: rgba(0, 204, 255, 0.2);
+  color: #00ccff;
+  border: 1px solid #00ccff;
+}
+
+.status-badge.completed {
+  background: rgba(0, 255, 136, 0.2);
+  color: #00ff88;
+  border: 1px solid #00ff88;
+}
+
+.report-meta {
+  margin-top: 0.5rem;
+}
+
+.location-info, .proof-info {
+  display: flex;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  color: #00ff88;
+  margin-bottom: 1rem;
+  opacity: 0.7;
+}
+
+.section-title {
+  color: white;
+  font-weight: 600;
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 2px;
+  background: linear-gradient(90deg, #00ff88, transparent);
+}
+
+/* Button Styles */
+.btn-primary {
+  background: linear-gradient(135deg, #00ccff, #0099cc);
+  border: none;
+  color: white;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #0099cc, #0077aa);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 204, 255, 0.4);
+  color: white;
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #00ff88, #00cc66);
+  border: none;
+  color: white;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 0.5rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, #00cc66, #00aa44);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+  color: white;
+}
+
+/* Text Colors for Better Readability */
+.text-white {
+  color: #ffffff !important;
+}
+
+.text-light {
+  color: #e0e0e0 !important;
+}
+
+.text-info {
+  color: #00ccff !important;
+}
+
+.text-success {
+  color: #00ff88 !important;
+}
+
+/* Badge Colors */
+.badge.bg-primary {
+  background: #00ccff !important;
+  color: #000;
+}
+
+.badge.bg-success {
+  background: #00ff88 !important;
+  color: #000;
+}
+</style>
 {% endblock %}
