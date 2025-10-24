@@ -2,10 +2,235 @@
 {% block content %}
 <section class="section-spacer">
   <div class="container">
-    <h2 class="heading">User Dashboard</h2>
-    <p class="text-white">You submitted <strong>{{ count }}</strong> reports.</p>
-    <a class="btn btn-neo" href="{% url 'submit_report' %}">Submit New Report</a>
-    <a class="btn btn-neo-outline" href="{% url 'report_list' %}">My Reports</a>
+    <!-- Header Section -->
+    <div class="dashboard-header text-center mb-5">
+      <h2 class="heading gradient-text">User Dashboard</h2>
+      <p class="text-light">Manage your submitted reports and track their progress</p>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="row mb-5">
+      <div class="col-md-8 mx-auto">
+        <div class="neo-card stats-card">
+          <div class="card-body text-center">
+            <div class="stats-main">
+              <div class="stats-icon-large">
+                <i class="fas fa-file-alt"></i>
+              </div>
+              <div class="stats-content">
+                <h1 class="stats-number text-white">{{ count }}</h1>
+                <p class="stats-label text-light">Total Reports Submitted</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row">
+      <div class="col-md-6">
+        <div class="action-card submit-card">
+          <div class="card-body text-center">
+            <div class="action-icon">
+              <i class="fas fa-plus-circle"></i>
+            </div>
+            <h4 class="text-white mb-3">Submit New Report</h4>
+            <p class="text-light mb-4">Report an issue or request assistance</p>
+            <a href="{% url 'submit_report' %}" class="btn btn-primary btn-lg w-100">
+              <i class="fas fa-plus me-2"></i>Submit Report
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="action-card view-card">
+          <div class="card-body text-center">
+            <div class="action-icon">
+              <i class="fas fa-list"></i>
+            </div>
+            <h4 class="text-white mb-3">View My Reports</h4>
+            <p class="text-light mb-4">Check status of all your submitted reports</p>
+            <a href="{% url 'report_list' %}" class="btn btn-success btn-lg w-100">
+              <i class="fas fa-eye me-2"></i>View Reports
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
+
+<style>
+.dashboard-header {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  padding: 2rem;
+  border-radius: 20px;
+  margin-bottom: 2rem;
+  border: 1px solid #333;
+}
+
+.gradient-text {
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.neo-card {
+  background: rgba(30, 30, 30, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid #333;
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.neo-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(255, 107, 107, 0.2);
+  border-color: #ff6b6b;
+}
+
+.stats-card {
+  background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+  border: 1px solid #444;
+}
+
+.stats-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+}
+
+.stats-icon-large {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  color: white;
+}
+
+.stats-number {
+  font-size: 4rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stats-label {
+  font-size: 1.2rem;
+  color: #ccc;
+}
+
+.action-card {
+  background: rgba(30, 30, 30, 0.8);
+  border: 1px solid #333;
+  border-radius: 16px;
+  padding: 2rem;
+  height: 100%;
+  transition: all 0.3s ease;
+}
+
+.action-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.submit-card:hover {
+  border-color: #00ccff;
+  box-shadow: 0 10px 30px rgba(0, 204, 255, 0.2);
+}
+
+.view-card:hover {
+  border-color: #00ff88;
+  box-shadow: 0 10px 30px rgba(0, 255, 136, 0.2);
+}
+
+.action-icon {
+  width: 70px;
+  height: 70px;
+  background: linear-gradient(135deg, #00ccff, #0099cc);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  color: white;
+  margin: 0 auto 1.5rem;
+}
+
+.view-card .action-icon {
+  background: linear-gradient(135deg, #00ff88, #00cc66);
+}
+
+/* Button Styles */
+.btn-primary {
+  background: linear-gradient(135deg, #00ccff, #0099cc);
+  border: none;
+  color: white;
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 1rem 2rem;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #0099cc, #0077aa);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 204, 255, 0.4);
+  color: white;
+}
+
+.btn-success {
+  background: linear-gradient(135deg, #00ff88, #00cc66);
+  border: none;
+  color: white;
+  font-weight: 600;
+  border-radius: 12px;
+  padding: 1rem 2rem;
+  transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+  background: linear-gradient(135deg, #00cc66, #00aa44);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 255, 136, 0.4);
+  color: white;
+}
+
+/* Text Colors */
+.text-white {
+  color: #ffffff !important;
+}
+
+.text-light {
+  color: #e0e0e0 !important;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stats-main {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .stats-number {
+    font-size: 3rem;
+  }
+
+  .action-card {
+    margin-bottom: 1rem;
+  }
+}
+</style>
 {% endblock %}

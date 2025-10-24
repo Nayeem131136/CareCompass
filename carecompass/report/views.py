@@ -4,7 +4,6 @@ from django.http import HttpResponseForbidden
 from .models import Report
 from .forms import ReportForm
 
-
 @login_required
 def submit_report(request):
     if request.method == "POST":
@@ -26,6 +25,7 @@ def submit_report(request):
             video=video,
             created_by=request.user
         )
+
 
         return redirect("report_list")
 

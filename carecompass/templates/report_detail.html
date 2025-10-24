@@ -8,7 +8,7 @@
       <!-- Reporter -->
       <div class="mb-3">
         <h5 class="text-neo">Reporter:</h5>
-        <p class="text-white-50">{{ report.submitted_by.username }}</p>
+        <p class="text-white-50">{{ report.created_by.username }}</p>
       </div>
 
       <!-- Title -->
@@ -45,39 +45,111 @@
       {% if report.latitude and report.longitude %}
       <div class="mb-3">
         <h5 class="text-neo">Location:</h5>
-        <p class="text-info">
-          {{ report.location }}
-        </p>
-        <div id="detail-map" style="height:300px;"></div>
-        <a href="https://www.google.com/maps?q={{ report.latitude }},{{ report.longitude }}" target="_blank" class="btn btn-neo-outline btn-sm mt-2">
+        <p class="text-info mb-2">{{ report.location }}</p>
+        <div id="detail-map" style="height:300px;" class="rounded shadow-sm"></div>
+        <a href="https://www.google.com/maps?q={{ report.latitude }},{{ report.longitude }}"
+           target="_blank" class="btn btn-neo-outline btn-sm mt-2">
           Open in Google Maps
         </a>
       </div>
       {% endif %}
 
-      <!-- Status -->
-      <div class="mb-3">
+      <!-- Status Section -->
+      <div class="mb-4 text-center">
         <h5 class="text-neo">Status:</h5>
-        <span class="badge bg-info">{{ report.status }}</span>
+
+        <!-- Status Badge Display -->
+        {% if report.status == "rejected" %}
+          <!-- NGO rejected - show to volunteer as pending -->
+          {% if report.accepted_by.role == "ngo" and user.role == "volunteer" %}
+            <span class="badge bg-warning px-3 py-2 text-uppercase">PENDING</span>
+
+          <!-- Volunteer rejected - show to NGO as pending -->
+          {% elif report.accepted_by.role == "volunteer" and user.role == "ngo" %}
+            <span class="badge bg-warning px-3 py-2 text-uppercase">PENDING</span>
+
+          <!-- Normal rejected case -->
+          {% else %}
+            <span class="badge bg-danger px-3 py-2 text-uppercase">REJECTED</span>
+          {% endif %}
+
+        {% else %}
+          <!-- Normal status display -->
+          <span class="badge
+            {% if report.status == 'pending' %}bg-warning
+            {% elif report.status == 'accepted' %}bg-primary
+            {% elif report.status == 'completed' %}bg-success
+            {% elif report.status == 'rejected' %}bg-danger{% endif %}
+            px-3 py-2 text-uppercase">
+            {{ report.status }}
+          </span>
+        {% endif %}
+
+        <!-- Action Buttons -->
+        {% if user.is_authenticated and user.role in "volunteer ngo" %}
+
+          <!-- CASE 1: Normal Pending Report -->
+          {% if report.status == "pending" %}
+            <div class="mt-3">
+              <a href="{% url 'report_action' report.id 'accept' %}" class="btn btn-success btn-sm px-4">Accept</a>
+              <a href="{% url 'report_action' report.id 'reject' %}" class="btn btn-danger btn-sm px-4">Reject</a>
+            </div>
+
+          <!-- CASE 2: NGO rejected - Volunteer can accept/reject -->
+          {% elif report.status == "rejected" and report.accepted_by.role == "ngo" and user.role == "volunteer" %}
+            <div class="mt-3">
+              <a href="{% url 'report_action' report.id 'accept' %}" class="btn btn-success btn-sm px-4">Accept</a>
+              <a href="{% url 'report_action' report.id 'reject' %}" class="btn btn-danger btn-sm px-4">Reject</a>
+            </div>
+
+          <!-- CASE 3: Volunteer rejected - NGO can accept/reject -->
+          {% elif report.status == "rejected" and report.accepted_by.role == "volunteer" and user.role == "ngo" %}
+            <div class="mt-3">
+              <a href="{% url 'report_action' report.id 'accept' %}" class="btn btn-success btn-sm px-4">Accept</a>
+              <a href="{% url 'report_action' report.id 'reject' %}" class="btn btn-danger btn-sm px-4">Reject</a>
+            </div>
+
+          <!-- CASE 4: Accepted by current user - Show completion form -->
+          {% elif report.status == "accepted" and report.accepted_by == user %}
+            <form method="post" enctype="multipart/form-data" action="{% url 'report_action' report.id 'complete' %}" class="mt-3">
+              {% csrf_token %}
+              <div class="mb-3">
+                <label class="form-label text-white">Upload Proof:</label>
+                <input type="file" name="proof" class="form-control">
+              </div>
+              <button type="submit" class="btn btn-success">Mark as Completed</button>
+            </form>
+
+          <!-- CASE 5: Completed -->
+          {% elif report.status == "completed" %}
+            <p class="text-success mt-3 fw-semibold">This report has been completed.</p>
+
+          <!-- CASE 6: Rejected by current user -->
+          {% elif report.status == "rejected" and report.accepted_by == user %}
+            <p class="text-danger mt-3 fw-semibold">You rejected this report.</p>
+          {% endif %}
+        {% endif %}
       </div>
 
-      <!-- Proof Upload -->
-      {% if report.proof %}
-      <div class="mb-3">
-        <h5 class="text-neo">Proof:</h5>
-        <a href="{{ report.proof.url }}" target="_blank" class="btn btn-neo-outline btn-sm">View Proof</a>
+      <!-- Accepted By Info -->
+      {% if report.accepted_by %}
+      <div class="mb-3 text-center">
+        <h5 class="text-neo">Accepted By:</h5>
+        <p class="text-white-50">
+          {{ report.accepted_by.username }} ({{ report.accepted_by.role|upper }})
+          {% if report.status == "rejected" %}
+            - <span class="text-danger">Rejected this report</span>
+          {% endif %}
+        </p>
       </div>
       {% endif %}
 
-      {% if user.is_authenticated and user.role in "ngo volunteer" %}
-      <form method="post" enctype="multipart/form-data" action="{% url 'report_action' report.id 'complete' %}">
-        {% csrf_token %}
-        <div class="mb-3">
-          <label class="form-label">Upload Proof:</label>
-          <input type="file" name="proof" class="form-control">
-        </div>
-        <button type="submit" class="btn btn-success">Mark as Completed</button>
-      </form>
+      <!-- Proof -->
+      {% if report.proof %}
+      <div class="mb-3 text-center">
+        <h5 class="text-neo">Proof:</h5>
+        <a href="{{ report.proof.url }}" target="_blank" class="btn btn-neo-outline btn-sm">View Uploaded Proof</a>
+      </div>
       {% endif %}
 
       <div class="mt-4 text-center">
@@ -87,7 +159,7 @@
   </div>
 </section>
 
-<!-- Embed map -->
+<!-- Google Map -->
 {% if report.latitude and report.longitude %}
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcvLDaLcU7nr7NKqx7tKsKTVCRPfu_9Ss"></script>
 <script>
@@ -95,7 +167,7 @@
     center: {lat: {{ report.latitude }}, lng: {{ report.longitude }}},
     zoom: 15
   });
-  let marker = new google.maps.Marker({
+  new google.maps.Marker({
     position: {lat: {{ report.latitude }}, lng: {{ report.longitude }}},
     map: map
   });
