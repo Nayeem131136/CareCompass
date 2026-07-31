@@ -11,10 +11,12 @@ class CustomUserCreationForm(UserCreationForm):
         ]
 
 class CustomUserChangeForm(UserChangeForm):
+    password = None  # Hide password field in profile form
+
     class Meta:
         model = CustomUser
         fields = [
-            'first_name', 'last_name', 'email', 'phone', 'bio',
-            'profile_pic', 'role', 'organization_name',
-            'certificate', 'skills'
+            'first_name', 'last_name', 'email', 'phone', 'address', 'bio',
+            'profile_pic', 'organization_name',
+            'certificate', 'license_file', 'skills'
         ]

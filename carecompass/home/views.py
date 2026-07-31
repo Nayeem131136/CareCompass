@@ -1,19 +1,18 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth import login
-from user.forms import CustomUserCreationForm
+from django.shortcuts import render
+from report.models import Report
+from user.models import CustomUser
 
 def home(request):
-    return render(request, 'home.html')
-
-def register(request):
-    if request.method == 'POST':
-        form = CustomUserCreationForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('dashboard')
-    else:
-        form = CustomUserCreationForm()
-    return render(request, 'register.html', {'form': form})
-
-
+    stats = {
+        'reports':   Report.objects.count(),
+        'volunteers': CustomUser.objects.filter(role='volunteer').count(),
+        'ngos':       CustomUser.objects.filter(role='ngo').count(),
+        'completed':  Report.objects.filter(status='completed').count(),
+    }
+    recent_reports = Report.objects.filter(
+        status__in=['pending','accepted']
+    ).order_by('-created_at')[:3]
+    return render(request, 'home.html', {
+        'stats': stats,
+        'recent_reports': recent_reports,
+    })

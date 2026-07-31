@@ -11,11 +11,13 @@ class CustomUser(AbstractUser):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='user')
     profile_pic = models.ImageField(upload_to='profiles/', blank=True, null=True)
     phone = models.CharField(max_length=20, blank=True)
+    address = models.TextField(blank=True, null=True)
     bio = models.TextField(blank=True)
 
     # NGO-specific
     organization_name = models.CharField(max_length=200, blank=True, null=True)
     certificate = models.FileField(upload_to='certificates/', blank=True, null=True)
+    license_file = models.FileField(upload_to='licenses/', blank=True, null=True)
 
     # Volunteer-specific
     skills = models.TextField(blank=True, null=True)

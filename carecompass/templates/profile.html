@@ -1,299 +1,514 @@
 {% extends "base.html" %}
+{% block title %}My Profile — CareCompass{% endblock %}
+
 {% block content %}
 <section class="section-spacer">
-  <div class="container">
-    <h2 class="heading mb-4">My Profile</h2>
+<div class="container" style="max-width:860px">
 
-    <div class="row g-4 justify-content-center">
-      <!-- Left Profile - Dynamic Display -->
-      <div class="col-lg-4">
-        <div class="glass p-4 text-center shadow-sm rounded h-100">
-          <!-- Profile Picture -->
-          <div class="profile-avatar-container mb-4">
-            {% if user.profile_pic %}
-              <img src="{{ user.profile_pic.url }}" class="profile-avatar img-fluid rounded-circle" alt="Profile Picture">
-            {% else %}
-              <div class="profile-avatar-placeholder rounded-circle mx-auto">
-                <i class="bi bi-person-circle"></i>
-              </div>
-            {% endif %}
-          </div>
+  {% if messages %}
+    {% for m in messages %}
+    <div class="mb-3 d-flex align-items-center gap-2 px-4 py-3"
+         style="border-radius:14px;background:rgba(74,222,128,.12);border:1px solid rgba(74,222,128,.35);color:#4ade80;font-weight:600">
+      <i class="bi bi-check-circle-fill fs-5"></i>{{ m }}
+    </div>
+    {% endfor %}
+  {% endif %}
 
-          <!-- User Basic Info -->
-          <div class="profile-info">
-            <h4 class="fw-bold text-white mb-2">{{ user.username }}</h4>
-            <p class="text-white-50 mb-3">{{ user.email }}</p>
+  <!-- ═══════════════ VIEW MODE ═══════════════ -->
+  <div id="view-section">
 
-            <!-- Role Badge -->
-            {% if user.role == "volunteer" %}
-              <span class="badge bg-success profile-badge">Volunteer</span>
-            {% elif user.role == "ngo" %}
-              <span class="badge bg-info profile-badge">NGO</span>
-            {% else %}
-              <span class="badge bg-secondary profile-badge">User</span>
-            {% endif %}
-          </div>
+    <!-- Top Hero Card -->
+    <div style="border-radius:24px;overflow:hidden;border:1px solid rgba(255,255,255,.13);
+                box-shadow:0 30px 80px rgba(0,0,0,.4)">
 
-          <!-- Dynamic Profile Details -->
-          <div class="profile-details mt-4 pt-3 border-top border-white-20">
-
-            <!-- Phone Number -->
-            {% if user.phone %}
-            <div class="detail-item mb-3">
-              <div class="text-white-50 small">Phone</div>
-              <div class="text-white">{{ user.phone }}</div>
-            </div>
-            {% endif %}
-
-            <!-- Address -->
-            {% if user.address %}
-            <div class="detail-item mb-3">
-              <div class="text-white-50 small">Address</div>
-              <div class="text-white">{{ user.address }}</div>
-            </div>
-            {% endif %}
-
-            <!-- Bio -->
-            {% if user.bio %}
-            <div class="detail-item mb-3">
-              <div class="text-white-50 small">Bio</div>
-              <div class="text-white">{{ user.bio|truncatewords:20 }}</div>
-            </div>
-            {% endif %}
-
-            <!-- Volunteer Skills -->
-            {% if user.role == "volunteer" and user.skills %}
-            <div class="detail-item mb-3">
-              <div class="text-white-50 small">Skills</div>
-              <div class="skills-display mt-1">
-                {% for skill in skills_list %}
-                  <span class="skill-badge">{{ skill }}</span>
-                {% endfor %}
-              </div>
-            </div>
-            {% endif %}
-
-            <!-- Volunteer Certificates -->
-            {% if user.role == "volunteer" and user.certificate %}
-            <div class="detail-item mb-3">
-              <div class="text-white-50 small">Certificate</div>
-              <a href="{{ user.certificate.url }}" target="_blank" class="text-info small">View Certificate</a>
-            </div>
-            {% endif %}
-
-            <!-- NGO Organization -->
-            {% if user.role == "ngo" and user.organization_name %}
-            <div class="detail-item mb-3">
-              <div class="text-white-50 small">Organization</div>
-              <div class="text-white">{{ user.organization_name }}</div>
-            </div>
-            {% endif %}
-
-            <!-- NGO License -->
-            {% if user.role == "ngo" and user.license_file %}
-            <div class="detail-item mb-3">
-              <div class="text-white-50 small">License</div>
-              <a href="{{ user.license_file.url }}" target="_blank" class="text-info small">View License</a>
-            </div>
-            {% endif %}
-
-          </div>
-
-          <!-- Member Since -->
-          <div class="profile-meta mt-3 pt-3 border-top border-white-20">
-            <div class="text-white-50 small">
-              Member since<br>
-              <span class="text-white">{{ user.date_joined|date:"M Y" }}</span>
-            </div>
-          </div>
-        </div>
+      <!-- Gradient banner -->
+      <div style="height:160px;position:relative;
+                  background:linear-gradient(135deg,#1e1040 0%,#1a2a6c 40%,#164030 100%)">
+        <!-- Animated glow blobs -->
+        <div style="position:absolute;width:220px;height:220px;border-radius:50%;
+                    background:radial-gradient(circle,rgba(109,40,217,.5),transparent 70%);
+                    top:-60px;left:60px;filter:blur(40px)"></div>
+        <div style="position:absolute;width:180px;height:180px;border-radius:50%;
+                    background:radial-gradient(circle,rgba(34,197,94,.4),transparent 70%);
+                    top:-40px;right:80px;filter:blur(40px)"></div>
+        <!-- Edit btn -->
+        <button onclick="toggleEdit(true)"
+                style="position:absolute;top:18px;right:18px;
+                       background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);
+                       color:#fff;border-radius:22px;padding:7px 20px;font-size:.82rem;
+                       font-weight:700;cursor:pointer;backdrop-filter:blur(6px);
+                       transition:all .2s;display:flex;align-items:center;gap:6px"
+                onmouseover="this.style.background='rgba(255,255,255,.25)'"
+                onmouseout="this.style.background='rgba(255,255,255,.15)'">
+          <i class="bi bi-pencil-fill" style="font-size:.75rem"></i> Edit Profile
+        </button>
       </div>
 
-      <!-- Right Form -->
-      <div class="col-lg-8">
-        <div class="glass p-4 rounded shadow-sm">
-          {% if messages %}
-            <div class="messages mb-4">
-              {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                  {{ message }}
-                  <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-              {% endfor %}
+      <!-- Avatar + name row -->
+      <div style="background:rgba(15,23,42,.85);backdrop-filter:blur(12px);padding:0 32px 28px">
+        <div style="display:flex;align-items:flex-end;gap:20px;margin-top:-52px;margin-bottom:20px">
+          <!-- Avatar -->
+          <div style="flex-shrink:0;position:relative">
+            {% if user.profile_pic %}
+              <img src="{{ user.profile_pic.url }}" alt="avatar"
+                   style="width:104px;height:104px;border-radius:50%;object-fit:cover;
+                          border:4px solid rgba(109,40,217,.6);
+                          box-shadow:0 0 0 4px rgba(109,40,217,.2),0 8px 24px rgba(0,0,0,.5)">
+            {% else %}
+              <div style="width:104px;height:104px;border-radius:50%;
+                          background:linear-gradient(135deg,#6d28d9,#2563eb);
+                          border:4px solid rgba(109,40,217,.6);
+                          box-shadow:0 0 0 4px rgba(109,40,217,.2),0 8px 24px rgba(0,0,0,.5);
+                          display:flex;align-items:center;justify-content:center;
+                          font-size:2.8rem;font-weight:800;color:#fff">
+                {{ user.username|first|upper }}
+              </div>
+            {% endif %}
+            <!-- Online dot -->
+            <div style="position:absolute;bottom:6px;right:6px;width:18px;height:18px;
+                        border-radius:50%;background:#22c55e;border:3px solid #0f172a;
+                        box-shadow:0 0 8px #22c55e"></div>
+          </div>
+          <!-- Name & role -->
+          <div style="padding-bottom:4px">
+            <h3 style="color:#f1f5f9;font-weight:800;margin:0 0 4px">
+              {{ user.get_full_name|default:user.username }}
+            </h3>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+              <span style="color:#94a3b8;font-size:.88rem">@{{ user.username }}</span>
+              {% if user.role == 'volunteer' %}
+                <span style="background:linear-gradient(135deg,rgba(34,197,94,.25),rgba(34,197,94,.1));
+                             color:#4ade80;border:1px solid rgba(34,197,94,.4);
+                             padding:3px 12px;border-radius:20px;font-size:.75rem;font-weight:700">
+                  🤝 Volunteer
+                </span>
+              {% elif user.role == 'ngo' %}
+                <span style="background:linear-gradient(135deg,rgba(37,99,235,.25),rgba(37,99,235,.1));
+                             color:#93c5fd;border:1px solid rgba(37,99,235,.4);
+                             padding:3px 12px;border-radius:20px;font-size:.75rem;font-weight:700">
+                  🏢 NGO
+                </span>
+              {% else %}
+                <span style="background:linear-gradient(135deg,rgba(251,191,36,.25),rgba(251,191,36,.1));
+                             color:#fbbf24;border:1px solid rgba(251,191,36,.4);
+                             padding:3px 12px;border-radius:20px;font-size:.75rem;font-weight:700">
+                  👤 User
+                </span>
+              {% endif %}
             </div>
+          </div>
+        </div>
+
+        <!-- ── Stats Row ── -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px">
+          {% if user.role == 'user' %}
+          <div style="text-align:center;padding:16px;border-radius:16px;
+                      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09)">
+            <div style="font-size:2rem;font-weight:800;color:#fff;line-height:1">{{ stats.total }}</div>
+            <div style="color:#64748b;font-size:.78rem;margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Reports</div>
+          </div>
+          <div style="text-align:center;padding:16px;border-radius:16px;
+                      background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.18)">
+            <div style="font-size:2rem;font-weight:800;color:#4ade80;line-height:1">{{ stats.completed }}</div>
+            <div style="color:#64748b;font-size:.78rem;margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Resolved</div>
+          </div>
+          <div style="text-align:center;padding:16px;border-radius:16px;
+                      background:rgba(251,191,36,.07);border:1px solid rgba(251,191,36,.18)">
+            <div style="font-size:2rem;font-weight:800;color:#fbbf24;line-height:1">{{ stats.pending }}</div>
+            <div style="color:#64748b;font-size:.78rem;margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Pending</div>
+          </div>
+          {% else %}
+          <div style="text-align:center;padding:16px;border-radius:16px;
+                      background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09)">
+            <div style="font-size:2rem;font-weight:800;color:#fff;line-height:1">{{ stats.total }}</div>
+            <div style="color:#64748b;font-size:.78rem;margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Handled</div>
+          </div>
+          <div style="text-align:center;padding:16px;border-radius:16px;
+                      background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.18)">
+            <div style="font-size:2rem;font-weight:800;color:#4ade80;line-height:1">{{ stats.completed }}</div>
+            <div style="color:#64748b;font-size:.78rem;margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Completed</div>
+          </div>
+          <div style="text-align:center;padding:16px;border-radius:16px;
+                      background:rgba(96,165,250,.07);border:1px solid rgba(96,165,250,.18)">
+            <div style="font-size:2rem;font-weight:800;color:#60a5fa;line-height:1">{{ stats.active }}</div>
+            <div style="color:#64748b;font-size:.78rem;margin-top:4px;font-weight:600;text-transform:uppercase;letter-spacing:.5px">Active</div>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- ── Info Grid ── -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+
+          {% if user.email %}
+          <div style="display:flex;align-items:center;gap:12px;padding:13px 16px;
+                      border-radius:14px;background:rgba(255,255,255,.04);
+                      border:1px solid rgba(255,255,255,.08)">
+            <div style="width:36px;height:36px;border-radius:10px;flex-shrink:0;
+                        background:rgba(96,165,250,.15);border:1px solid rgba(96,165,250,.25);
+                        display:flex;align-items:center;justify-content:center">
+              <i class="bi bi-envelope-fill" style="color:#60a5fa;font-size:.9rem"></i>
+            </div>
+            <div style="min-width:0">
+              <div style="color:#475569;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Email</div>
+              <div style="color:#e2e8f0;font-size:.88rem;font-weight:600;
+                          white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ user.email }}</div>
+            </div>
+          </div>
           {% endif %}
 
-          <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-
-            {% if form.non_field_errors %}
-              <div class="alert alert-danger">
-                {{ form.non_field_errors }}
-              </div>
-            {% endif %}
-
-            <!-- Profile Picture -->
-            <div class="mb-3">
-              <label class="form-label text-white">Profile Picture</label>
-              <input type="file" name="profile_pic" class="form-control" accept="image/*">
-              {% if user.profile_pic %}
-                <small class="text-white-50">Current file: {{ user.profile_pic.name }}</small>
-              {% endif %}
+          {% if user.phone %}
+          <div style="display:flex;align-items:center;gap:12px;padding:13px 16px;
+                      border-radius:14px;background:rgba(255,255,255,.04);
+                      border:1px solid rgba(255,255,255,.08)">
+            <div style="width:36px;height:36px;border-radius:10px;flex-shrink:0;
+                        background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.25);
+                        display:flex;align-items:center;justify-content:center">
+              <i class="bi bi-telephone-fill" style="color:#4ade80;font-size:.9rem"></i>
             </div>
-
-            <!-- Phone -->
-            <div class="mb-3">
-              <label class="form-label text-white">Phone</label>
-              <input type="text" name="phone" value="{{ user.phone|default:'' }}" class="form-control" placeholder="Enter your phone number">
-              {% if form.phone.errors %}
-                <div class="text-danger small">{{ form.phone.errors }}</div>
-              {% endif %}
+            <div>
+              <div style="color:#475569;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Phone</div>
+              <div style="color:#e2e8f0;font-size:.88rem;font-weight:600">{{ user.phone }}</div>
             </div>
+          </div>
+          {% endif %}
 
-            <!-- Address - For All Roles -->
-            <div class="mb-3">
-              <label class="form-label text-white">Address</label>
-              <textarea name="address" rows="2" class="form-control" placeholder="Enter your full address">{{ user.address|default:'' }}</textarea>
-              {% if form.address.errors %}
-                <div class="text-danger small">{{ form.address.errors }}</div>
-              {% endif %}
+          {% if user.address %}
+          <div style="display:flex;align-items:center;gap:12px;padding:13px 16px;
+                      border-radius:14px;background:rgba(255,255,255,.04);
+                      border:1px solid rgba(255,255,255,.08)">
+            <div style="width:36px;height:36px;border-radius:10px;flex-shrink:0;
+                        background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.25);
+                        display:flex;align-items:center;justify-content:center">
+              <i class="bi bi-geo-alt-fill" style="color:#fbbf24;font-size:.9rem"></i>
             </div>
-
-            <!-- Bio -->
-            <div class="mb-3">
-              <label class="form-label text-white">Bio</label>
-              <textarea name="bio" rows="3" class="form-control" placeholder="Tell us about yourself...">{{ user.bio|default:'' }}</textarea>
-              {% if form.bio.errors %}
-                <div class="text-danger small">{{ form.bio.errors }}</div>
-              {% endif %}
+            <div>
+              <div style="color:#475569;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Address</div>
+              <div style="color:#e2e8f0;font-size:.88rem;font-weight:600">{{ user.address }}</div>
             </div>
+          </div>
+          {% endif %}
 
-            <!-- Volunteer Specific Fields -->
-            {% if user.role == "volunteer" %}
-              <div class="mb-3">
-                <label class="form-label text-white">Skills (comma separated)</label>
-                <input type="text" name="skills" value="{{ user.skills|default:'' }}" class="form-control" placeholder="e.g. First Aid, Communication, Teaching">
-                {% if form.skills.errors %}
-                  <div class="text-danger small">{{ form.skills.errors }}</div>
-                {% endif %}
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label text-white">Certificate Upload</label>
-                {% if user.certificate %}
-                  <p class="mt-2">
-                    <a href="{{ user.certificate.url }}" target="_blank" class="text-info">View Current Certificate</a>
-                  </p>
-                {% endif %}
-                <input type="file" name="certificate" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
-                {% if form.certificate.errors %}
-                  <div class="text-danger small">{{ form.certificate.errors }}</div>
-                {% endif %}
-              </div>
-            {% endif %}
-
-            <!-- NGO Specific Fields -->
-            {% if user.role == "ngo" %}
-              <div class="mb-3">
-                <label class="form-label text-white">Organization Name</label>
-                <input type="text" name="organization_name" value="{{ user.organization_name|default:'' }}" class="form-control" placeholder="Enter your organization name">
-                {% if form.organization_name.errors %}
-                  <div class="text-danger small">{{ form.organization_name.errors }}</div>
-                {% endif %}
-              </div>
-
-              <div class="mb-3">
-                <label class="form-label text-white">License Upload</label>
-                {% if user.license_file %}
-                  <p class="mt-2">
-                    <a href="{{ user.license_file.url }}" target="_blank" class="text-info">View Current License</a>
-                  </p>
-                {% endif %}
-                <input type="file" name="license_file" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
-                {% if form.license_file.errors %}
-                  <div class="text-danger small">{{ form.license_file.errors }}</div>
-                {% endif %}
-              </div>
-            {% endif %}
-
-            <div class="text-end mt-4">
-              <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+          <div style="display:flex;align-items:center;gap:12px;padding:13px 16px;
+                      border-radius:14px;background:rgba(255,255,255,.04);
+                      border:1px solid rgba(255,255,255,.08)">
+            <div style="width:36px;height:36px;border-radius:10px;flex-shrink:0;
+                        background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.25);
+                        display:flex;align-items:center;justify-content:center">
+              <i class="bi bi-calendar3" style="color:#a78bfa;font-size:.9rem"></i>
             </div>
-          </form>
+            <div>
+              <div style="color:#475569;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Member Since</div>
+              <div style="color:#e2e8f0;font-size:.88rem;font-weight:600">{{ user.date_joined|date:"F Y" }}</div>
+            </div>
+          </div>
+
+          {% if user.role == 'ngo' and user.organization_name %}
+          <div style="display:flex;align-items:center;gap:12px;padding:13px 16px;
+                      border-radius:14px;background:rgba(255,255,255,.04);
+                      border:1px solid rgba(255,255,255,.08);grid-column:1/-1">
+            <div style="width:36px;height:36px;border-radius:10px;flex-shrink:0;
+                        background:rgba(96,165,250,.15);border:1px solid rgba(96,165,250,.25);
+                        display:flex;align-items:center;justify-content:center">
+              <i class="bi bi-building" style="color:#60a5fa;font-size:.9rem"></i>
+            </div>
+            <div>
+              <div style="color:#475569;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px">Organization</div>
+              <div style="color:#e2e8f0;font-size:.88rem;font-weight:600">{{ user.organization_name }}</div>
+            </div>
+          </div>
+          {% endif %}
+
         </div>
+
+        <!-- Bio -->
+        {% if user.bio %}
+        <div style="padding:16px;border-radius:14px;background:rgba(255,255,255,.04);
+                    border:1px solid rgba(255,255,255,.08);margin-bottom:12px">
+          <div style="color:#475569;font-size:.7rem;font-weight:700;text-transform:uppercase;
+                      letter-spacing:.5px;margin-bottom:8px">
+            <i class="bi bi-person-lines-fill me-1"></i>About
+          </div>
+          <p style="color:#cbd5e1;margin:0;line-height:1.75;font-size:.93rem">{{ user.bio }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Skills -->
+        {% if skills_list %}
+        <div style="padding:16px;border-radius:14px;background:rgba(255,255,255,.04);
+                    border:1px solid rgba(255,255,255,.08);margin-bottom:12px">
+          <div style="color:#475569;font-size:.7rem;font-weight:700;text-transform:uppercase;
+                      letter-spacing:.5px;margin-bottom:10px">
+            <i class="bi bi-lightning-fill me-1"></i>Skills
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            {% for skill in skills_list %}
+            <span style="background:rgba(109,40,217,.2);color:#c4b5fd;
+                         border:1px solid rgba(109,40,217,.35);
+                         padding:5px 14px;border-radius:20px;font-size:.8rem;font-weight:600">
+              {{ skill }}
+            </span>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Certificate / License -->
+        {% if user.role == 'volunteer' and user.certificate %}
+        <div style="display:flex;justify-content:space-between;align-items:center;
+                    padding:14px 16px;border-radius:14px;margin-bottom:12px;
+                    background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.2)">
+          <div style="display:flex;align-items:center;gap:10px">
+            <i class="bi bi-file-earmark-check-fill" style="color:#4ade80;font-size:1.2rem"></i>
+            <div>
+              <div style="color:#4ade80;font-size:.8rem;font-weight:700">Certificate Uploaded</div>
+              <div style="color:#64748b;font-size:.75rem">Verification document</div>
+            </div>
+          </div>
+          <a href="{{ user.certificate.url }}" target="_blank"
+             style="background:rgba(34,197,94,.15);color:#4ade80;border:1px solid rgba(34,197,94,.3);
+                    padding:6px 16px;border-radius:20px;font-size:.8rem;font-weight:700;text-decoration:none">
+            View
+          </a>
+        </div>
+        {% endif %}
+
+        {% if user.role == 'ngo' and user.license_file %}
+        <div style="display:flex;justify-content:space-between;align-items:center;
+                    padding:14px 16px;border-radius:14px;margin-bottom:12px;
+                    background:rgba(96,165,250,.07);border:1px solid rgba(96,165,250,.2)">
+          <div style="display:flex;align-items:center;gap:10px">
+            <i class="bi bi-file-earmark-check-fill" style="color:#60a5fa;font-size:1.2rem"></i>
+            <div>
+              <div style="color:#60a5fa;font-size:.8rem;font-weight:700">License Uploaded</div>
+              <div style="color:#64748b;font-size:.75rem">NGO License Document</div>
+            </div>
+          </div>
+          <a href="{{ user.license_file.url }}" target="_blank"
+             style="background:rgba(96,165,250,.15);color:#60a5fa;border:1px solid rgba(96,165,250,.3);
+                    padding:6px 16px;border-radius:20px;font-size:.8rem;font-weight:700;text-decoration:none">
+            View
+          </a>
+        </div>
+        {% endif %}
+
+        <!-- Edit button bottom -->
+        <button onclick="toggleEdit(true)"
+                style="width:100%;padding:13px;border-radius:14px;border:none;cursor:pointer;font-weight:700;
+                       background:linear-gradient(135deg,#6d28d9,#2563eb);color:#fff;font-size:.95rem;
+                       box-shadow:0 8px 24px rgba(109,40,217,.35);transition:all .2s;display:flex;
+                       align-items:center;justify-content:center;gap:8px"
+                onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+          <i class="bi bi-pencil-square"></i> Edit Profile
+        </button>
       </div>
     </div>
   </div>
+  <!-- ═══════════════ END VIEW ═══════════════ -->
+
+
+  <!-- ═══════════════ EDIT FORM ═══════════════ -->
+  <div id="edit-section" style="display:none">
+    <div style="border-radius:24px;overflow:hidden;border:1px solid rgba(255,255,255,.13);
+                background:rgba(15,23,42,.85);backdrop-filter:blur(12px);
+                box-shadow:0 30px 80px rgba(0,0,0,.4)">
+
+      <!-- Header -->
+      <div style="padding:22px 28px;border-bottom:1px solid rgba(255,255,255,.08);
+                  display:flex;justify-content:space-between;align-items:center;
+                  background:linear-gradient(90deg,rgba(109,40,217,.15),rgba(37,99,235,.1))">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:38px;height:38px;border-radius:10px;
+                      background:linear-gradient(135deg,#6d28d9,#2563eb);
+                      display:flex;align-items:center;justify-content:center">
+            <i class="bi bi-pencil-fill" style="color:#fff;font-size:.9rem"></i>
+          </div>
+          <h5 style="color:#f1f5f9;font-weight:800;margin:0;font-size:1.1rem">Edit Profile</h5>
+        </div>
+        <button onclick="toggleEdit(false)"
+                style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);
+                       color:#94a3b8;border-radius:20px;padding:6px 16px;cursor:pointer;
+                       font-size:.82rem;font-weight:700;display:flex;align-items:center;gap:5px"
+                onmouseover="this.style.background='rgba(255,255,255,.15)'"
+                onmouseout="this.style.background='rgba(255,255,255,.08)'">
+          <i class="bi bi-x-lg" style="font-size:.75rem"></i> Cancel
+        </button>
+      </div>
+
+      <form method="post" enctype="multipart/form-data" style="padding:28px">
+        {% csrf_token %}
+
+        <!-- Profile Picture -->
+        <div style="margin-bottom:22px">
+          <label style="display:block;color:#94a3b8;font-size:.75rem;font-weight:700;
+                        text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">
+            Profile Picture
+          </label>
+          <div style="display:flex;align-items:center;gap:14px">
+            {% if user.profile_pic %}
+              <img src="{{ user.profile_pic.url }}"
+                   style="width:60px;height:60px;border-radius:50%;object-fit:cover;
+                          border:2px solid rgba(109,40,217,.5)">
+            {% else %}
+              <div style="width:60px;height:60px;border-radius:50%;flex-shrink:0;
+                          background:linear-gradient(135deg,#6d28d9,#2563eb);
+                          display:flex;align-items:center;justify-content:center;
+                          font-size:1.5rem;font-weight:800;color:#fff;
+                          border:2px solid rgba(109,40,217,.5)">
+                {{ user.username|first|upper }}
+              </div>
+            {% endif %}
+            <input type="file" name="profile_pic" accept="image/*"
+                   style="flex:1;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+                          color:#e2e8f0;border-radius:12px;padding:10px 14px;font-size:.88rem">
+          </div>
+        </div>
+
+        <!-- Fields grid -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+          <div>
+            <label style="display:block;color:#94a3b8;font-size:.75rem;font-weight:700;
+                          text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px">
+              <i class="bi bi-telephone me-1"></i>Phone
+            </label>
+            <input type="text" name="phone" value="{{ user.phone|default:'' }}"
+                   placeholder="+880 1X XX XXX XXX"
+                   style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+                          color:#f1f5f9;border-radius:12px;padding:11px 14px;font-size:.9rem;outline:none"
+                   onfocus="this.style.borderColor='rgba(109,40,217,.7)';this.style.boxShadow='0 0 0 3px rgba(109,40,217,.2)'"
+                   onblur="this.style.borderColor='rgba(255,255,255,.12)';this.style.boxShadow='none'">
+          </div>
+
+          {% if user.role == 'ngo' %}
+          <div>
+            <label style="display:block;color:#94a3b8;font-size:.75rem;font-weight:700;
+                          text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px">
+              <i class="bi bi-building me-1"></i>Organization
+            </label>
+            <input type="text" name="organization_name" value="{{ user.organization_name|default:'' }}"
+                   placeholder="Your NGO name"
+                   style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+                          color:#f1f5f9;border-radius:12px;padding:11px 14px;font-size:.9rem;outline:none"
+                   onfocus="this.style.borderColor='rgba(109,40,217,.7)';this.style.boxShadow='0 0 0 3px rgba(109,40,217,.2)'"
+                   onblur="this.style.borderColor='rgba(255,255,255,.12)';this.style.boxShadow='none'">
+          </div>
+          {% endif %}
+
+          <div style="grid-column:1/-1">
+            <label style="display:block;color:#94a3b8;font-size:.75rem;font-weight:700;
+                          text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px">
+              <i class="bi bi-geo-alt me-1"></i>Address
+            </label>
+            <input type="text" name="address" value="{{ user.address|default:'' }}"
+                   placeholder="Your full address"
+                   style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+                          color:#f1f5f9;border-radius:12px;padding:11px 14px;font-size:.9rem;outline:none"
+                   onfocus="this.style.borderColor='rgba(109,40,217,.7)';this.style.boxShadow='0 0 0 3px rgba(109,40,217,.2)'"
+                   onblur="this.style.borderColor='rgba(255,255,255,.12)';this.style.boxShadow='none'">
+          </div>
+
+          <div style="grid-column:1/-1">
+            <label style="display:block;color:#94a3b8;font-size:.75rem;font-weight:700;
+                          text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px">
+              <i class="bi bi-person-lines-fill me-1"></i>Bio
+            </label>
+            <textarea name="bio" rows="3" placeholder="Tell others about yourself..."
+                      style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+                             color:#f1f5f9;border-radius:12px;padding:11px 14px;font-size:.9rem;
+                             outline:none;resize:vertical"
+                      onfocus="this.style.borderColor='rgba(109,40,217,.7)';this.style.boxShadow='0 0 0 3px rgba(109,40,217,.2)'"
+                      onblur="this.style.borderColor='rgba(255,255,255,.12)';this.style.boxShadow='none'">{{ user.bio|default:'' }}</textarea>
+          </div>
+
+          {% if user.role == 'volunteer' %}
+          <div style="grid-column:1/-1">
+            <label style="display:block;color:#94a3b8;font-size:.75rem;font-weight:700;
+                          text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px">
+              <i class="bi bi-lightning me-1"></i>Skills
+            </label>
+            <input type="text" name="skills" value="{{ user.skills|default:'' }}"
+                   placeholder="First Aid, Driving, Communication..."
+                   style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+                          color:#f1f5f9;border-radius:12px;padding:11px 14px;font-size:.9rem;outline:none"
+                   onfocus="this.style.borderColor='rgba(109,40,217,.7)';this.style.boxShadow='0 0 0 3px rgba(109,40,217,.2)'"
+                   onblur="this.style.borderColor='rgba(255,255,255,.12)';this.style.boxShadow='none'">
+            <div style="color:#475569;font-size:.75rem;margin-top:5px">Separate skills with commas</div>
+          </div>
+          <div style="grid-column:1/-1">
+            <label style="display:block;color:#94a3b8;font-size:.75rem;font-weight:700;
+                          text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px">
+              <i class="bi bi-file-earmark-check me-1"></i>Certificate Upload
+            </label>
+            {% if user.certificate %}
+            <div style="margin-bottom:8px">
+              <a href="{{ user.certificate.url }}" target="_blank"
+                 style="color:#4ade80;font-size:.82rem;text-decoration:none">
+                <i class="bi bi-paperclip me-1"></i>Current — click to view
+              </a>
+            </div>
+            {% endif %}
+            <input type="file" name="certificate" accept=".pdf,.jpg,.jpeg,.png"
+                   style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+                          color:#e2e8f0;border-radius:12px;padding:10px 14px;font-size:.88rem">
+          </div>
+          {% endif %}
+
+          {% if user.role == 'ngo' %}
+          <div style="grid-column:1/-1">
+            <label style="display:block;color:#94a3b8;font-size:.75rem;font-weight:700;
+                          text-transform:uppercase;letter-spacing:.5px;margin-bottom:7px">
+              <i class="bi bi-file-earmark-check me-1"></i>License Document
+            </label>
+            {% if user.license_file %}
+            <div style="margin-bottom:8px">
+              <a href="{{ user.license_file.url }}" target="_blank"
+                 style="color:#60a5fa;font-size:.82rem;text-decoration:none">
+                <i class="bi bi-paperclip me-1"></i>Current — click to view
+              </a>
+            </div>
+            {% endif %}
+            <input type="file" name="license_file" accept=".pdf,.jpg,.jpeg,.png"
+                   style="width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+                          color:#e2e8f0;border-radius:12px;padding:10px 14px;font-size:.88rem">
+          </div>
+          {% endif %}
+
+        </div>
+
+        <!-- Action buttons -->
+        <div style="display:flex;gap:12px;margin-top:24px;padding-top:20px;
+                    border-top:1px solid rgba(255,255,255,.08)">
+          <button type="submit"
+                  style="flex:1;padding:13px;border-radius:14px;border:none;cursor:pointer;
+                         font-weight:700;font-size:.95rem;color:#fff;
+                         background:linear-gradient(135deg,#6d28d9,#2563eb);
+                         box-shadow:0 8px 24px rgba(109,40,217,.35);
+                         display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s"
+                  onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+            <i class="bi bi-check-circle-fill"></i> Save Changes
+          </button>
+          <button type="button" onclick="toggleEdit(false)"
+                  style="padding:13px 28px;border-radius:14px;cursor:pointer;font-weight:700;
+                         font-size:.9rem;color:#94a3b8;background:rgba(255,255,255,.06);
+                         border:1px solid rgba(255,255,255,.12);transition:all .2s"
+                  onmouseover="this.style.background='rgba(255,255,255,.12)'"
+                  onmouseout="this.style.background='rgba(255,255,255,.06)'">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- ═══════════════ END EDIT ═══════════════ -->
+
+</div>
 </section>
 
-<style>
-.profile-avatar-container {
-  position: relative;
-  display: inline-block;
+<script>
+function toggleEdit(show) {
+  document.getElementById('view-section').style.display = show ? 'none' : 'block';
+  document.getElementById('edit-section').style.display = show ? 'block' : 'none';
+  window.scrollTo({top: 0, behavior: 'smooth'});
 }
-
-.profile-avatar {
-  width: 150px;
-  height: 150px;
-  object-fit: cover;
-  border: 4px solid rgba(255, 255, 255, 0.1);
-  border-radius: 50%;
-}
-
-.profile-avatar-placeholder {
-  width: 150px;
-  height: 150px;
-  background: rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-}
-
-.profile-avatar-placeholder i {
-  font-size: 5rem;
-  color: rgba(255, 255, 255, 0.3);
-}
-
-.profile-badge {
-  padding: 0.5rem 1.5rem;
-  font-size: 0.9rem;
-  border-radius: 20px;
-  font-weight: 500;
-}
-
-.border-white-20 {
-  border-color: rgba(255, 255, 255, 0.2) !important;
-}
-
-.profile-info h4 {
-  font-size: 1.5rem;
-  font-weight: 600;
-}
-
-.detail-item {
-  text-align: left;
-}
-
-.skills-display {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-}
-
-.skill-badge {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  padding: 0.2rem 0.6rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.profile-meta {
-  font-size: 0.9rem;
-  text-align: center;
-}
-</style>
+</script>
 {% endblock %}
