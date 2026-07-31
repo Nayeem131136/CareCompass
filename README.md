@@ -286,4 +286,3 @@ Pillow>=10.0
 *Built with ❤️ for Bangladesh | CSE 314 — University of Asia Pacific*
 
 </div>
-
