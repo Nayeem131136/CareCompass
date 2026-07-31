@@ -1,69 +1,100 @@
 {% extends "base.html" %}
+{% block title %}Leaderboard — CareCompass{% endblock %}
 {% block content %}
 <section class="section-spacer">
   <div class="container">
-
-    <h2 class="heading mb-5 text-center">Leaderboards</h2>
+    <h2 class="heading mb-2"><i class="bi bi-trophy-fill me-2" style="color:#fbbf24"></i>Leaderboards</h2>
+    <p class="subtext">Recognizing our top contributors who make a difference</p>
 
     <div class="row g-4">
       <!-- Top Users -->
       <div class="col-md-4">
-        <div class="card shadow-sm">
-          <div class="card-header bg-primary text-white">
-            Top Report Submitters
+        <div class="glass p-4 h-100">
+          <h5 class="text-white fw-bold mb-3 text-center">
+            <span style="font-size:1.4rem">📝</span><br>Top Report Submitters
+          </h5>
+          {% for u in top_users %}
+          <div class="d-flex justify-content-between align-items-center py-2"
+               style="border-bottom:1px solid rgba(255,255,255,.1)">
+            <div class="d-flex align-items-center gap-2">
+              <span class="fw-bold" style="
+                color:{% if forloop.counter == 1 %}#fbbf24{% elif forloop.counter == 2 %}#94a3b8{% elif forloop.counter == 3 %}#cd7c2d{% else %}#e5e7eb{% endif %};
+                font-size:1.1rem;min-width:1.5rem">
+                {% if forloop.counter <= 3 %}
+                  {% if forloop.counter == 1 %}🥇{% elif forloop.counter == 2 %}🥈{% else %}🥉{% endif %}
+                {% else %}{{ forloop.counter }}.{% endif %}
+              </span>
+              <span class="text-white">{{ u.username }}</span>
+            </div>
+            <span class="badge rounded-pill" style="background:rgba(96,165,250,.25);color:#93c5fd;border:1px solid rgba(96,165,250,.4)">
+              {{ u.count }}
+            </span>
           </div>
-          <ul class="list-group list-group-flush">
-            {% for user in top_users %}
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span>{{ forloop.counter }}. {{ user.username }}</span>
-                <span class="badge bg-primary rounded-pill">{{ user.count }}</span>
-              </li>
-            {% empty %}
-              <li class="list-group-item text-muted">No users found.</li>
-            {% endfor %}
-          </ul>
+          {% empty %}
+          <p class="text-white-50 text-center py-3">No data yet</p>
+          {% endfor %}
         </div>
       </div>
 
       <!-- Top Volunteers -->
       <div class="col-md-4">
-        <div class="card shadow-sm">
-          <div class="card-header bg-warning text-dark">
-            Top Volunteers
+        <div class="glass p-4 h-100">
+          <h5 class="text-white fw-bold mb-3 text-center">
+            <span style="font-size:1.4rem">🤝</span><br>Top Volunteers
+          </h5>
+          {% for v in top_volunteers %}
+          <div class="d-flex justify-content-between align-items-center py-2"
+               style="border-bottom:1px solid rgba(255,255,255,.1)">
+            <div class="d-flex align-items-center gap-2">
+              <span class="fw-bold" style="
+                color:{% if forloop.counter == 1 %}#fbbf24{% elif forloop.counter == 2 %}#94a3b8{% elif forloop.counter == 3 %}#cd7c2d{% else %}#e5e7eb{% endif %};
+                font-size:1.1rem;min-width:1.5rem">
+                {% if forloop.counter <= 3 %}
+                  {% if forloop.counter == 1 %}🥇{% elif forloop.counter == 2 %}🥈{% else %}🥉{% endif %}
+                {% else %}{{ forloop.counter }}.{% endif %}
+              </span>
+              <span class="text-white">{{ v.username }}</span>
+            </div>
+            <span class="badge rounded-pill" style="background:rgba(251,191,36,.2);color:#fbbf24;border:1px solid rgba(251,191,36,.4)">
+              {{ v.count }}
+            </span>
           </div>
-          <ul class="list-group list-group-flush">
-            {% for volunteer in top_volunteers %}
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span>{{ forloop.counter }}. {{ volunteer.username }}</span>
-                <span class="badge bg-warning text-dark rounded-pill">{{ volunteer.count }}</span>
-              </li>
-            {% empty %}
-              <li class="list-group-item text-muted">No volunteers found.</li>
-            {% endfor %}
-          </ul>
+          {% empty %}
+          <p class="text-white-50 text-center py-3">No data yet</p>
+          {% endfor %}
         </div>
       </div>
 
       <!-- Top NGOs -->
       <div class="col-md-4">
-        <div class="card shadow-sm">
-          <div class="card-header bg-success text-white">
-            Top NGOs
+        <div class="glass p-4 h-100">
+          <h5 class="text-white fw-bold mb-3 text-center">
+            <span style="font-size:1.4rem">🏢</span><br>Top NGOs
+          </h5>
+          {% for n in top_ngos %}
+          <div class="d-flex justify-content-between align-items-center py-2"
+               style="border-bottom:1px solid rgba(255,255,255,.1)">
+            <div class="d-flex align-items-center gap-2">
+              <span class="fw-bold" style="
+                color:{% if forloop.counter == 1 %}#fbbf24{% elif forloop.counter == 2 %}#94a3b8{% elif forloop.counter == 3 %}#cd7c2d{% else %}#e5e7eb{% endif %};
+                font-size:1.1rem;min-width:1.5rem">
+                {% if forloop.counter <= 3 %}
+                  {% if forloop.counter == 1 %}🥇{% elif forloop.counter == 2 %}🥈{% else %}🥉{% endif %}
+                {% else %}{{ forloop.counter }}.{% endif %}
+              </span>
+              <span class="text-white">{{ n.username }}</span>
+            </div>
+            <span class="badge rounded-pill" style="background:rgba(74,222,128,.2);color:#4ade80;border:1px solid rgba(74,222,128,.4)">
+              {{ n.count }}
+            </span>
           </div>
-          <ul class="list-group list-group-flush">
-            {% for ngo in top_ngos %}
-              <li class="list-group-item d-flex justify-content-between align-items-center">
-                <span>{{ forloop.counter }}. {{ ngo.username }}</span>
-                <span class="badge bg-success rounded-pill">{{ ngo.count }}</span>
-              </li>
-            {% empty %}
-              <li class="list-group-item text-muted">No NGOs found.</li>
-            {% endfor %}
-          </ul>
+          {% empty %}
+          <p class="text-white-50 text-center py-3">No data yet</p>
+          {% endfor %}
         </div>
       </div>
-    </div>
 
+    </div>
   </div>
 </section>
 {% endblock %}

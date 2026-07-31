@@ -1,35 +1,78 @@
 {% extends "base.html" %}
+{% block title %}Reports — CareCompass{% endblock %}
 {% block content %}
 <section class="section-spacer">
   <div class="container">
-    <h2 class="heading">All Reports</h2>
-    <div class="row g-3 mt-2">
+
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+      <h2 class="heading mb-0">
+        {% if user.role == 'user' %}<i class="bi bi-file-earmark-text me-2"></i>My Reports
+        {% else %}<i class="bi bi-list-ul me-2"></i>All Reports{% endif %}
+      </h2>
+      {% if user.role == 'user' %}
+        <a href="{% url 'submit_report' %}" class="btn btn-neo">
+          <i class="bi bi-plus-circle me-1"></i>Submit New Report
+        </a>
+      {% endif %}
+    </div>
+
+    <!-- Status Filter -->
+    <div class="d-flex gap-2 flex-wrap mb-4">
+      <a href="{% url 'report_list' %}" class="btn btn-sm {% if not status_filter %}btn-neo{% else %}btn-neo-outline{% endif %}">All</a>
+      <a href="{% url 'report_list' %}?status=pending"   class="btn btn-sm {% if status_filter == 'pending' %}btn-neo{% else %}btn-neo-outline{% endif %}">⏳ Pending</a>
+      <a href="{% url 'report_list' %}?status=accepted"  class="btn btn-sm {% if status_filter == 'accepted' %}btn-neo{% else %}btn-neo-outline{% endif %}">✅ Accepted</a>
+      <a href="{% url 'report_list' %}?status=completed" class="btn btn-sm {% if status_filter == 'completed' %}btn-neo{% else %}btn-neo-outline{% endif %}">🏁 Completed</a>
+      <a href="{% url 'report_list' %}?status=rejected"  class="btn btn-sm {% if status_filter == 'rejected' %}btn-neo{% else %}btn-neo-outline{% endif %}">❌ Rejected</a>
+    </div>
+
+    <div class="row g-3">
       {% for r in reports %}
-        <div class="col-md-6">
-          <div class="glass p-3 h-100">
-            <h6 class="text-white mb-1">
-              {{ r.title }}
-              <span class="badge bg-light text-dark ms-1">{{ r.status }}</span>
-            </h6>
-            <p class="text-white-50 mb-2">{{ r.description|truncatechars:100 }}</p>
-
-            {% if r.photo %}
-              <img src="{{ r.photo.url }}" class="img-fluid rounded mb-2">
-            {% endif %}
-
-            {% if r.latitude and r.longitude %}
-              <p class="text-info mb-2">
-                📍 <a href="https://maps.google.com/?q={{ r.latitude }},{{ r.longitude }}" target="_blank">
-                  {{ r.location }}
-                </a>
-              </p>
-            {% endif %}
-
-            <a href="{% url 'report_detail' r.id %}" class="btn btn-neo-outline btn-sm">View Details</a>
+      <div class="col-md-6 col-lg-4">
+        <div class="report-card-wrap">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <span class="report-title-text">{{ r.title|truncatechars:45 }}</span>
+            <span class="status-pill ms-1
+              {% if r.status == 'pending' %}badge-pending
+              {% elif r.status == 'accepted' %}badge-accepted
+              {% elif r.status == 'completed' %}badge-completed
+              {% else %}badge-rejected{% endif %}">
+              {{ r.status }}
+            </span>
           </div>
+
+          <p class="report-desc-text mb-2">{{ r.description|truncatechars:100 }}</p>
+
+          {% if r.photo %}
+            <img src="{{ r.photo.url }}" class="img-fluid rounded mb-2" style="max-height:130px;object-fit:cover;width:100%;">
+          {% endif %}
+
+          {% if r.location %}
+            <p class="text-info small mb-1"><i class="bi bi-geo-alt-fill me-1"></i>{{ r.location|truncatechars:55 }}</p>
+          {% endif %}
+
+          <div class="d-flex justify-content-between align-items-center mt-2">
+            <small class="text-white-50"><i class="bi bi-clock me-1"></i>{{ r.created_at|date:"M d, Y" }}</small>
+            <small class="text-white-50">By: {{ r.created_by.username }}</small>
+          </div>
+
+          <a href="{% url 'report_detail' r.id %}" class="btn btn-neo-outline btn-sm w-100 mt-2">
+            <i class="bi bi-eye me-1"></i>View Details
+          </a>
         </div>
+      </div>
       {% empty %}
-        <p class="text-white-50">No reports available.</p>
+      <div class="col-12">
+        <div class="glass p-5 text-center">
+          <div style="font-size:3rem">📋</div>
+          <h5 class="text-white mt-2">No reports found</h5>
+          {% if user.role == 'user' %}
+          <p class="text-white-50">You haven't submitted any reports yet.</p>
+          <a href="{% url 'submit_report' %}" class="btn btn-neo mt-2">Submit a Report</a>
+          {% else %}
+          <p class="text-white-50">No reports match the selected filter.</p>
+          {% endif %}
+        </div>
+      </div>
       {% endfor %}
     </div>
   </div>

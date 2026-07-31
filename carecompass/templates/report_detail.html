@@ -1,176 +1,174 @@
 {% extends "base.html" %}
+{% block title %}Report Details — CareCompass{% endblock %}
 {% block content %}
 <section class="section-spacer">
-  <div class="container">
-    <div class="auth-card shadow-lg p-4 rounded-3">
-      <h2 class="auth-title text-center mb-4">Report Details</h2>
-
-      <!-- Reporter -->
-      <div class="mb-3">
-        <h5 class="text-neo">Reporter:</h5>
-        <p class="text-white-50">{{ report.created_by.username }}</p>
+  <div class="container" style="max-width:760px">
+    <div class="auth-card">
+      <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h3 class="auth-title mb-0"><i class="bi bi-file-earmark-text me-2"></i>Report Details</h3>
+        <span class="status-pill
+          {% if report.status == 'pending' %}badge-pending
+          {% elif report.status == 'accepted' %}badge-accepted
+          {% elif report.status == 'completed' %}badge-completed
+          {% else %}badge-rejected{% endif %}" style="font-size:.85rem;padding:.35rem 1rem">
+          {{ report.status|upper }}
+        </span>
       </div>
 
-      <!-- Title -->
-      <div class="mb-3">
-        <h5 class="text-neo">Title:</h5>
-        <p class="text-white-50">{{ report.title }}</p>
+      <!-- Info rows -->
+      <div class="mb-3 pb-3" style="border-bottom:1px solid rgba(255,255,255,.15)">
+        <div class="text-white-50 small mb-1">Reporter</div>
+        <div class="text-white fw-semibold">{{ report.created_by.username }}</div>
+      </div>
+      <div class="mb-3 pb-3" style="border-bottom:1px solid rgba(255,255,255,.15)">
+        <div class="text-white-50 small mb-1">Title</div>
+        <div class="text-white fw-bold fs-5">{{ report.title }}</div>
+      </div>
+      <div class="mb-3 pb-3" style="border-bottom:1px solid rgba(255,255,255,.15)">
+        <div class="text-white-50 small mb-1">Description</div>
+        <div class="text-white" style="line-height:1.7">{{ report.description }}</div>
+      </div>
+      <div class="mb-3 pb-3" style="border-bottom:1px solid rgba(255,255,255,.15)">
+        <div class="text-white-50 small mb-1">Submitted</div>
+        <div class="text-white">{{ report.created_at|date:"F d, Y — h:i A" }}</div>
       </div>
 
-      <!-- Description -->
-      <div class="mb-3">
-        <h5 class="text-neo">Description:</h5>
-        <p class="text-white-50">{{ report.description }}</p>
-      </div>
-
-      <!-- Photo -->
       {% if report.photo %}
-      <div class="mb-3">
-        <h5 class="text-neo">Photo:</h5>
-        <img src="{{ report.photo.url }}" alt="Report Photo" class="img-fluid rounded shadow-sm mt-2">
+      <div class="mb-3 pb-3" style="border-bottom:1px solid rgba(255,255,255,.15)">
+        <div class="text-white-50 small mb-2">Photo</div>
+        <img src="{{ report.photo.url }}" class="img-fluid rounded shadow-sm" style="max-height:350px;object-fit:contain;">
       </div>
       {% endif %}
 
-      <!-- Video -->
       {% if report.video %}
-      <div class="mb-3">
-        <h5 class="text-neo">Video:</h5>
-        <video controls class="w-100 rounded">
-          <source src="{{ report.video.url }}" type="video/mp4">
+      <div class="mb-3 pb-3" style="border-bottom:1px solid rgba(255,255,255,.15)">
+        <div class="text-white-50 small mb-2">Video</div>
+        <video controls class="w-100 rounded" style="max-height:300px;">
+          <source src="{{ report.video.url }}">Your browser doesn't support video.
         </video>
       </div>
       {% endif %}
 
-      <!-- Location -->
       {% if report.latitude and report.longitude %}
-      <div class="mb-3">
-        <h5 class="text-neo">Location:</h5>
-        <p class="text-info mb-2">{{ report.location }}</p>
-        <div id="detail-map" style="height:300px;" class="rounded shadow-sm"></div>
+      <div class="mb-3 pb-3" style="border-bottom:1px solid rgba(255,255,255,.15)">
+        <div class="text-white-50 small mb-2">Location</div>
+        {% if report.location %}
+          <p class="text-info small mb-2"><i class="bi bi-geo-alt-fill me-1"></i>{{ report.location }}</p>
+        {% endif %}
+        <div id="detail-map" style="height:280px;border-radius:12px;" class="shadow-sm mb-2"></div>
         <a href="https://www.google.com/maps?q={{ report.latitude }},{{ report.longitude }}"
-           target="_blank" class="btn btn-neo-outline btn-sm mt-2">
-          Open in Google Maps
+           target="_blank" class="btn btn-neo-outline btn-sm">
+          <i class="bi bi-map me-1"></i>Open in Google Maps
         </a>
       </div>
       {% endif %}
 
-      <!-- Status Section -->
-      <div class="mb-4 text-center">
-        <h5 class="text-neo">Status:</h5>
+      {% if report.accepted_by %}
+      <div class="mb-3 pb-3" style="border-bottom:1px solid rgba(255,255,255,.15)">
+        <div class="text-white-50 small mb-1">Handled By</div>
+        <div class="text-white">
+          <i class="bi bi-person-check-fill me-1 text-success"></i>
+          {{ report.accepted_by.username }}
+          <span class="badge ms-1" style="background:rgba(255,255,255,.15);color:#e5e7eb">{{ report.accepted_by.role|upper }}</span>
+        </div>
+      </div>
+      {% endif %}
 
-        <!-- Status Badge Display -->
-        {% if report.status == "rejected" %}
-          <!-- NGO rejected - show to volunteer as pending -->
-          {% if report.accepted_by.role == "ngo" and user.role == "volunteer" %}
-            <span class="badge bg-warning px-3 py-2 text-uppercase">PENDING</span>
+      {% if report.proof %}
+      <div class="mb-3 pb-3" style="border-bottom:1px solid rgba(255,255,255,.15)">
+        <div class="text-white-50 small mb-2">Proof of Completion</div>
+        <a href="{{ report.proof.url }}" target="_blank" class="btn btn-neo-outline btn-sm">
+          <i class="bi bi-paperclip me-1"></i>View Uploaded Proof
+        </a>
+      </div>
+      {% endif %}
 
-          <!-- Volunteer rejected - show to NGO as pending -->
-          {% elif report.accepted_by.role == "volunteer" and user.role == "ngo" %}
-            <span class="badge bg-warning px-3 py-2 text-uppercase">PENDING</span>
+      <!-- ── Action Section ── -->
+      {% if user.is_authenticated %}
+        {% if user.role == 'volunteer' or user.role == 'ngo' %}
 
-          <!-- Normal rejected case -->
-          {% else %}
-            <span class="badge bg-danger px-3 py-2 text-uppercase">REJECTED</span>
-          {% endif %}
-
-        {% else %}
-          <!-- Normal status display -->
-          <span class="badge
-            {% if report.status == 'pending' %}bg-warning
-            {% elif report.status == 'accepted' %}bg-primary
-            {% elif report.status == 'completed' %}bg-success
-            {% elif report.status == 'rejected' %}bg-danger{% endif %}
-            px-3 py-2 text-uppercase">
-            {{ report.status }}
-          </span>
-        {% endif %}
-
-        <!-- Action Buttons -->
-        {% if user.is_authenticated and user.role in "volunteer ngo" %}
-
-          <!-- CASE 1: Normal Pending Report -->
-          {% if report.status == "pending" %}
-            <div class="mt-3">
-              <a href="{% url 'report_action' report.id 'accept' %}" class="btn btn-success btn-sm px-4">Accept</a>
-              <a href="{% url 'report_action' report.id 'reject' %}" class="btn btn-danger btn-sm px-4">Reject</a>
+          {% if report.status == 'pending' %}
+          <div class="mt-4">
+            <div class="text-white-50 small mb-2">Actions</div>
+            <div class="d-flex gap-3">
+              <a href="{% url 'report_action' report.id 'accept' %}"
+                 class="btn btn-success flex-grow-1">
+                <i class="bi bi-check-circle-fill me-1"></i>Accept this Report
+              </a>
+              <a href="{% url 'report_action' report.id 'reject' %}"
+                 class="btn btn-danger">
+                <i class="bi bi-x-circle-fill me-1"></i>Reject
+              </a>
             </div>
+          </div>
 
-          <!-- CASE 2: NGO rejected - Volunteer can accept/reject -->
-          {% elif report.status == "rejected" and report.accepted_by.role == "ngo" and user.role == "volunteer" %}
-            <div class="mt-3">
-              <a href="{% url 'report_action' report.id 'accept' %}" class="btn btn-success btn-sm px-4">Accept</a>
-              <a href="{% url 'report_action' report.id 'reject' %}" class="btn btn-danger btn-sm px-4">Reject</a>
-            </div>
+          {% elif report.status == 'rejected' and report.accepted_by != user %}
+          <div class="mt-4">
+            <div class="text-white-50 small mb-2">This report was rejected — you can accept it</div>
+            <a href="{% url 'report_action' report.id 'accept' %}" class="btn btn-success w-100">
+              <i class="bi bi-check-circle-fill me-1"></i>Accept this Report
+            </a>
+          </div>
 
-          <!-- CASE 3: Volunteer rejected - NGO can accept/reject -->
-          {% elif report.status == "rejected" and report.accepted_by.role == "volunteer" and user.role == "ngo" %}
-            <div class="mt-3">
-              <a href="{% url 'report_action' report.id 'accept' %}" class="btn btn-success btn-sm px-4">Accept</a>
-              <a href="{% url 'report_action' report.id 'reject' %}" class="btn btn-danger btn-sm px-4">Reject</a>
-            </div>
-
-          <!-- CASE 4: Accepted by current user - Show completion form -->
-          {% elif report.status == "accepted" and report.accepted_by == user %}
-            <form method="post" enctype="multipart/form-data" action="{% url 'report_action' report.id 'complete' %}" class="mt-3">
+          {% elif report.status == 'accepted' and report.accepted_by == user %}
+          <div class="mt-4">
+            <div class="text-white-50 small mb-3">You accepted this report — upload proof to mark complete</div>
+            {% if proof_error %}
+              <div class="alert alert-warning py-2">{{ proof_error }}</div>
+            {% endif %}
+            <form method="post" enctype="multipart/form-data"
+                  action="{% url 'report_action' report.id 'complete' %}">
               {% csrf_token %}
               <div class="mb-3">
-                <label class="form-label text-white">Upload Proof:</label>
-                <input type="file" name="proof" class="form-control">
+                <label class="form-label text-white fw-bold">Upload Proof <span class="text-danger">*</span></label>
+                <input type="file" name="proof" class="form-control" accept="image/*,video/*,.pdf" required>
+                <small class="text-white-50">Photo, video or PDF evidence of help provided</small>
               </div>
-              <button type="submit" class="btn btn-success">Mark as Completed</button>
+              <button type="submit" class="btn btn-success w-100">
+                <i class="bi bi-check2-all me-1"></i>Mark as Completed
+              </button>
             </form>
+          </div>
 
-          <!-- CASE 5: Completed -->
-          {% elif report.status == "completed" %}
-            <p class="text-success mt-3 fw-semibold">This report has been completed.</p>
+          {% elif report.status == 'accepted' and report.accepted_by != user %}
+          <div class="mt-3">
+            <div class="glass p-3 text-center">
+              <small class="text-white-50">This report has been accepted by {{ report.accepted_by.username }}</small>
+            </div>
+          </div>
 
-          <!-- CASE 6: Rejected by current user -->
-          {% elif report.status == "rejected" and report.accepted_by == user %}
-            <p class="text-danger mt-3 fw-semibold">You rejected this report.</p>
+          {% elif report.status == 'completed' %}
+          <div class="mt-3">
+            <div class="glass p-3 text-center" style="border-color:rgba(74,222,128,.4)">
+              <i class="bi bi-check-circle-fill text-success me-2"></i>
+              <span class="text-success fw-semibold">This report has been completed successfully.</span>
+            </div>
+          </div>
           {% endif %}
+
         {% endif %}
-      </div>
-
-      <!-- Accepted By Info -->
-      {% if report.accepted_by %}
-      <div class="mb-3 text-center">
-        <h5 class="text-neo">Accepted By:</h5>
-        <p class="text-white-50">
-          {{ report.accepted_by.username }} ({{ report.accepted_by.role|upper }})
-          {% if report.status == "rejected" %}
-            - <span class="text-danger">Rejected this report</span>
-          {% endif %}
-        </p>
-      </div>
       {% endif %}
+      <!-- ── end actions ── -->
 
-      <!-- Proof -->
-      {% if report.proof %}
-      <div class="mb-3 text-center">
-        <h5 class="text-neo">Proof:</h5>
-        <a href="{{ report.proof.url }}" target="_blank" class="btn btn-neo-outline btn-sm">View Uploaded Proof</a>
-      </div>
-      {% endif %}
-
-      <div class="mt-4 text-center">
-        <a href="{% url 'report_list' %}" class="btn btn-neo-outline">Back to Reports</a>
+      <div class="mt-4 pt-3" style="border-top:1px solid rgba(255,255,255,.15)">
+        <a href="javascript:history.back()" class="btn btn-neo-outline">
+          <i class="bi bi-arrow-left me-1"></i>Go Back
+        </a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Google Map -->
 {% if report.latitude and report.longitude %}
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcvLDaLcU7nr7NKqx7tKsKTVCRPfu_9Ss"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-  let map = new google.maps.Map(document.getElementById('detail-map'), {
-    center: {lat: {{ report.latitude }}, lng: {{ report.longitude }}},
-    zoom: 15
-  });
-  new google.maps.Marker({
-    position: {lat: {{ report.latitude }}, lng: {{ report.longitude }}},
-    map: map
-  });
+  var map = L.map('detail-map').setView([{{ report.latitude }}, {{ report.longitude }}], 15);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+  L.marker([{{ report.latitude }}, {{ report.longitude }}]).addTo(map)
+    .bindPopup('<strong>{{ report.title|escapejs }}</strong>').openPopup();
 </script>
 {% endif %}
 {% endblock %}

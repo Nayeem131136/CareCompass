@@ -1,81 +1,80 @@
 {% extends "base.html" %}
+{% block title %}Submit Report — CareCompass{% endblock %}
 {% block content %}
 <section class="section-spacer">
-  <div class="container auth-wrap">
-    <div class="auth-card glass p-4 shadow-lg">
-      <h2 class="auth-title text-center mb-4">Submit a New Report</h2>
+  <div class="container" style="max-width:760px">
+    <div class="auth-card">
+      <h2 class="auth-title text-center mb-1"><i class="bi bi-plus-circle-fill me-2"></i>Submit a Report</h2>
+      <p class="text-center text-white-50 mb-4">Report someone who needs help — we'll connect them with volunteers & NGOs</p>
+
+      {% if error %}
+        <div class="alert alert-danger"><i class="bi bi-exclamation-triangle me-1"></i>{{ error }}</div>
+      {% endif %}
 
       <form method="post" enctype="multipart/form-data" novalidate>
         {% csrf_token %}
 
         <div class="mb-3">
-          <label class="form-label fw-bold">Title</label>
-          <input type="text" name="title" class="form-control" required>
+          <label class="form-label">Title <span class="text-danger">*</span></label>
+          <input type="text" name="title" class="form-control" placeholder="e.g. Homeless person needs food near Farmgate" required>
         </div>
 
         <div class="mb-3">
-          <label class="form-label fw-bold">Description</label>
-          <textarea name="description" rows="4" class="form-control" required></textarea>
+          <label class="form-label">Description <span class="text-danger">*</span></label>
+          <textarea name="description" rows="4" class="form-control"
+            placeholder="Describe the situation — what help is needed, how many people, any urgency..." required></textarea>
         </div>
 
-        <div class="mb-3">
-          <label class="form-label fw-bold">Photo</label>
-          <input type="file" name="photo" class="form-control">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Photo <span class="text-white-50">(optional)</span></label>
+            <input type="file" name="photo" class="form-control" accept="image/*">
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Video <span class="text-white-50">(optional)</span></label>
+            <input type="file" name="video" class="form-control" accept="video/*">
+          </div>
         </div>
 
-        <div class="mb-3">
-          <label class="form-label fw-bold">Video</label>
-          <input type="file" name="video" class="form-control">
+        <div class="mb-2">
+          <label class="form-label">Incident Location</label>
+          <input type="text" name="location" id="location-input" class="form-control mb-2"
+                 placeholder="Click on the map to select location" readonly>
         </div>
-
-        <div class="mb-3">
-         <label class="form-label fw-bold">Incident Location</label>
-         <input type="text" name="location" class="form-control" placeholder="Select on map" readonly>
-        </div>
-
-
-        <div id="map" style="height:300px;" class="mb-3"></div>
-        <input type="hidden" name="latitude" id="lat">
+        <div id="map" style="height:280px;border-radius:14px;" class="mb-3 shadow-sm"></div>
+        <input type="hidden" name="latitude"  id="lat">
         <input type="hidden" name="longitude" id="lng">
+        <small class="text-white-50 d-block mb-3"><i class="bi bi-info-circle me-1"></i>Click anywhere on the map to drop a pin</small>
 
-        <button type="submit" class="btn btn-neo w-100">Submit Report</button>
+        <button type="submit" class="btn btn-neo w-100">
+          <i class="bi bi-send-fill me-2"></i>Submit Report
+        </button>
       </form>
     </div>
   </div>
 </section>
 
-<!-- Google Maps API -->
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDcvLDaLcU7nr7NKqx7tKsKTVCRPfu_9Ss&libraries=places"></script>
-
+<link  rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-  let map = new google.maps.Map(document.getElementById('map'), {
-    center: {lat: 23.8103, lng: 90.4125},  // Dhaka default
-    zoom: 12
-  });
+  var map = L.map('map').setView([23.8103, 90.4125], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
 
-  let marker;
-  let geocoder = new google.maps.Geocoder();
-
-  map.addListener('click', function(e){
-    let lat = e.latLng.lat();
-    let lng = e.latLng.lng();
-
-    // remove previous marker
-    if(marker) marker.setMap(null);
-
-    // add new marker
-    marker = new google.maps.Marker({position: e.latLng, map: map});
-
-    // set hidden inputs
+  var marker;
+  map.on('click', function(e) {
+    var lat = e.latlng.lat, lng = e.latlng.lng;
+    if (marker) map.removeLayer(marker);
+    marker = L.marker([lat, lng]).addTo(map);
     document.getElementById('lat').value = lat;
     document.getElementById('lng').value = lng;
-
-    // optional: reverse geocode to fill address input
-    geocoder.geocode({location: e.latLng}, function(results, status){
-      if(status === "OK" && results[0]){
-        document.querySelector("input[name='location']").value = results[0].formatted_address;
-      }
-    });
+    fetch('https://nominatim.openstreetmap.org/reverse?format=json&lat='+lat+'&lon='+lng)
+      .then(r=>r.json()).then(d=>{
+        document.getElementById('location-input').value = d.display_name || (lat.toFixed(5)+', '+lng.toFixed(5));
+      }).catch(()=>{
+        document.getElementById('location-input').value = lat.toFixed(5)+', '+lng.toFixed(5);
+      });
   });
 </script>
 {% endblock %}
